@@ -1,0 +1,21 @@
+.MessagesContainer {
+    display: flex;
+    flex-direction: column;
+    >.msg-container {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        >.msg {
+            width: 50%;
+            border: 1px solid black;
+            display: flex;
+        }
+
+        >.msg.user1 {
+        }
+
+        >.msg.user2 {
+            align-self: flex-end;
+        }
+    }
+}

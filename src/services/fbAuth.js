@@ -26,8 +26,9 @@ const register = async (email, password, displayName, avatarUrl) => {
         await setDoc(doc(db, "users", newUser.user.uid), userData);
 
         toast.success('kayit oldun');
-        userData.firebaseUser = newUser
-        return userData //userData
+        newUser.userData = userData;
+        // userData.firebaseUser = newUser
+        return newUser//userData
     }
     catch (err) {
         toast.error(err);
@@ -45,9 +46,8 @@ const login = async (email, password) => {
         toast.success("giris yapildi")
         console.log(user)
         const data = await getDocData("users", user.user.uid);
-        data.firebaseUser = user;
-        console.log(data)
-        return data;
+        user.userData = data;
+        return user;
     }
     catch (err) {
         console.log(err)
@@ -88,10 +88,10 @@ async function onAuthStateChangedPrm() {
             if (user) {
                 console.log(user)
                 const userDoc = await getDocData('users', user.uid)
-                userDoc.firebaseUser = user;
-                console.log(userDoc)
-                resolve(userDoc)
-                return userDoc;
+                const newUser = { uid: user.uid };
+                newUser.userData = userDoc;
+                resolve(newUser)
+                return newUser;
             } else {
                 resolve(null)
             }

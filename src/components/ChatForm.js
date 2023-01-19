@@ -5,13 +5,13 @@ import { sendAMessage } from '../services/fb';
 
 export default function ChatForm({ currChat }) {
     const [input, setInput] = useState('');
-    const user = useSelector(state => state.user.user)
+    const userData = useSelector(state => state.user.user.userData)
     const handleSendMessage = (e) => {
         //send message
-        sendAMessage(user, currChat.id, {
+        sendAMessage(userData, currChat.id, {
             ...dataModel.privMessageData,
             message: input,
-            from: user.id
+            from: userData.id
         })
     }
     return (

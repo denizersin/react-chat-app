@@ -5,7 +5,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import toast from "react-hot-toast";
 import { dataModel, getMergedId, privMessageData } from "../constants";
-import { register } from "../features/userSlice";
+import { register, updateUserData } from "../features/userSlice";
 import { store } from "../features/store";
 import { updateChatDataById, updateMessagesById } from "../features/userChatsSlice";
 
@@ -131,7 +131,6 @@ export const getUserChats = async (user) => {
         return chatData.messages.filter(msg => msg.from !== user.id && msg.recievedTime === null)
             .map(msg => setMsgRecieved(chatData.id, msg.id))
     })
-    console.log(userChatsdata)
     return userChatsdata
 }
 
@@ -179,18 +178,16 @@ export const sendChatRequest = async (user, user2Id) => {
 
 export const respondChatRequest = async (user, user2Id, isApprove) => {
     const ref = doc(db, 'users', user.id);
-    await setDoc(ref,
+    await updateDoc(ref,
         {
             "recievedRequestIds": arrayRemove(user2Id)
         },
-        { merge: true }
     );
     const ref2 = doc(db, 'users', user2Id);
-    await setDoc(ref2,
+    await updateDoc(ref2,
         {
             "sentRequestIds": arrayRemove(user.id)
         },
-        { merge: true }
     );
     if (!isApprove) return;
     await createPrivChat(user, user2Id);
@@ -203,17 +200,21 @@ export const respondChatRequest = async (user, user2Id, isApprove) => {
 
 
 
-const listeners = {
+export const listeners = {
     userChatsUnsb: [],
     currChatUnsb: null,
+    listenUserData: null,
 }
 
 
-export const listenUserData = (user){
+export const listenUserData = (user) => {
     const unsub = onSnapshot(doc(db, "users", user.id), (doc) => {
         const currentData = doc.data();
-
+        console.log(currentData, "-----")
+        console.log(currentData.recievedRequestIds.length);
+        store.dispatch(updateUserData(currentData))
     });
+    listeners.listenUserData = unsub;
 }
 
 export const lisetnUserChats = (user, userChatsData) => {
@@ -232,7 +233,6 @@ export const lisetnUserChats = (user, userChatsData) => {
             collection(db, "userChats", chatId, "messages"),
         );
         const unsubscribe2 = onSnapshot(q2, async (querySnapshot) => {
-            console.log(store.getState().userChats)
             const newData = await getNewMessage(store.getState().userChats.value[chatId], 1)
             store.dispatch(updateMessagesById({
                 id: chatId,
@@ -308,8 +308,6 @@ export const searchUsersByName = async (user, userName) => {
     const q = query(collection(db, "users"), where(`displayName`, ">=", userName), orderBy("displayName"), where(`displayName`, "<=", userName + 'z'));
     let findedUsers = await getDocsWithQuery(q);
     // findedUsers = findedUsers.filter(findedUser => findedUser.id != user.id);
-    console.log("qweq")
-    console.log(findedUsers)
     return findedUsers;
     // return resultArr;
 }
@@ -333,7 +331,6 @@ async function getAllDocsData(...args) {
         data.push(doc.data());
         data.at(-1).id = doc.id;
     });
-    console.log(data)
     return data;
 }
 

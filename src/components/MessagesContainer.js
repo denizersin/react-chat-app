@@ -7,9 +7,9 @@ export default function MessagesContainer({chatData}) {
     return (
         <div className={'MessagesContainer component'}> <span>MessagesContainer</span>
             {messages.map(msg => {
-                const msgOwner = msg.from == user.id ? user : chatData.user2
+                const msgOwner = msg.from == user.uid ? user.userData : chatData.user2
                 return (<div key={msg.id} className={`msg-container`}>
-                    <div className={`msg ${msg.from == user.id ? "user1" : "user2"}`}>
+                    <div className={`msg ${msg.from == user.uid ? "user1" : "user2"}`}>
                         {msgOwner.displayName + " " + msg.message}
                     </div>
                 </div>)

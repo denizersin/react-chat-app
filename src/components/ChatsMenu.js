@@ -10,18 +10,19 @@ import ChatLink from './ChatLink';
 
 
 export default function ChatsMenu({ setCurrChat }) {
+    console.log('chats menu rendered')
+
     const user = useSelector(state => state.user.user);
+    const userData = useSelector(state => state.user.user.userData);
     const chatsData = useSelector(state => state.userChats.value);
-    console.log('re-render', chatsData)
     async function setInitialChatsData() {
-        const newData = await getUserChats(user)
+        const newData = await getUserChats(user.userData)
         store.dispatch(updateChatsDataValue(newData))
-        lisetnUserChats(user)
+        lisetnUserChats(user.userData)
     }
     useEffect(() => {
         setInitialChatsData();
     }, []);
-
 
     if (chatsData == null) return;
     //!!!

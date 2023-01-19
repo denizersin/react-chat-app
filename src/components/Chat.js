@@ -4,8 +4,8 @@ import ChatForm from './ChatForm'
 import MessagesContainer from './MessagesContainer'
 
 export default function Chat({ currChat, setCurrChat }) {
+    console.log('chat-rendered')
 
-    
     const currChatData = useSelector(state => state.userChats.value[currChat.id])
     return (
         <div className={'Chat component'}> <span>Chat</span>

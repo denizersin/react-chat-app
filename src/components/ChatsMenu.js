@@ -22,7 +22,7 @@ export default function ChatsMenu({ setCurrChat }) {
     }
     useEffect(() => {
         setInitialChatsData();
-    }, []);
+    }, [userData]);
 
     if (chatsData == null) return;
     //!!!

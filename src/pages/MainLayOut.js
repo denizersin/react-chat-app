@@ -9,14 +9,18 @@ import { logOut } from '../features/userSlice'
 import Deneme from './Deneme'
 
 export default function MainLayOut() {
-
+    const navigate = useNavigate();
     return (
         <div className={'MainLayOut component'}> <span>MainLayOut</span>
             <nav>
                 <button onClick={() => {
                     store.dispatch(logOut())
                 }}>logout</button>
+                <button onClick={() => {navigate('/auth') }}>login </button>
+                <button onClick={() => {navigate('/register') }}>register </button>
+
             </nav>
+
             <Toaster
                 position="top-center"
                 reverseOrder={false}

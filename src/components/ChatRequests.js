@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { getUsers, respondChatRequest } from '../services/fb';
-import ChatLink from './ChatLink';
 
 export default function ChatRequests() {
-    const userData = useSelector(state => state.user.user.userData);
-
+    const userData = useSelector(state => state.userData.value);
+    
     const [requests, setRequests] = useState([]);
     const getUser = async () => {
         if (userData.recievedRequestIds.length == 0) {

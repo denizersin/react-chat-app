@@ -8,7 +8,7 @@
           flex-direction: column;
 }
 
-.MessagesContainer > .msg-container {
+.MessagesContainer > .Message {
   width: 100%;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -19,7 +19,7 @@
           flex-direction: column;
 }
 
-.MessagesContainer > .msg-container > .msg {
+.MessagesContainer > .Message > .msg {
   width: 50%;
   border: 1px solid black;
   display: -webkit-box;
@@ -27,7 +27,7 @@
   display: flex;
 }
 
-.MessagesContainer > .msg-container > .msg.user2 {
+.MessagesContainer > .Message > .msg.user2 {
   -ms-flex-item-align: end;
       align-self: flex-end;
 }

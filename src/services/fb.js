@@ -5,9 +5,9 @@ import { doc, updateDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import toast from "react-hot-toast";
 import { dataModel, getMergedId, privMessageData } from "../constants";
-import { register, updateUserData } from "../features/userSlice";
 import { store } from "../features/store";
-import { updateChatDataById, updateMessagesById } from "../features/userChatsSlice";
+import { addNewChatToUserChats, updateChatDataById, updateChatsDataValue, updateMessagesById } from "../features/userChatsSlice";
+import { updateUserData } from "../features/userDataSlice";
 
 export let hello = "asd";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -26,6 +26,18 @@ const firebaseConfig = {
     databaseURL: "https://cath-in-default-rtdb.firebaseio.com/",
 
 };
+
+const resetTime = (obj) => {
+    if (obj.sentTime !== null) {
+        obj.sentTime = 1;
+    }
+    if (obj.sawTime !== null) {
+        obj.sentTime = 1;
+    }
+    if (obj.recievedTime !== null) {
+        obj.sentTime = 1;
+    }
+}
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -66,13 +78,6 @@ export const sendAMessage = async (user, chatId, messageData) => {
             id: newDocRef.id, //set its id initiallay
         }
     )
-    const ref = doc(db, 'userChats', chatId);
-    await setDoc(ref,
-        {
-            [user.id]: increment(1)
-        },
-        { merge: true }
-    );
 }
 
 
@@ -90,6 +95,7 @@ export async function getUsers(userIds) {
 
 export const getUserChats = async (user) => {
     const { chatIds } = user;
+    if (chatIds.length == 0) return {}
     const q = query(
         collection(db, "userChats"),
         where(documentId(), "in",
@@ -118,6 +124,7 @@ export const getUserChats = async (user) => {
         let unSawMessagesNum = data[user2Id];
         unSawMessagesNum = unSawMessagesNum < 50 ? 50 : unSawMessagesNum
         return getNewMessage(data, unSawMessagesNum).then(dataArr => {
+            dataArr.forEach(msgData => resetTime(msgData));
             data.messages = dataArr
             data.gotMsgNum = dataArr.length;
         })
@@ -126,28 +133,37 @@ export const getUserChats = async (user) => {
     await Promise.all(promises);
 
 
-    //set recieved as loggin first time!
-    const promises2 = chatsData.map(chatData => {
-        return chatData.messages.filter(msg => msg.from !== user.id && msg.recievedTime === null)
-            .map(msg => setMsgRecieved(chatData.id, msg.id))
-    })
+    // const promises2 = chatsData.map(chatData => {
+    //     return chatData.messages.filter(msg => msg.from !== user.id && msg.recievedTime === null)
+    //         .map(msg => setMessagesRecieved(chatData.id, [msg]))
+    // })
     return userChatsdata
+    return Object.values(userChatsdata);
 }
 
 
-export async function setMsgRecieved(chatId, msgId) {
-    const msgref = doc(db, "userChats", chatId, "messages", msgId);
-    await updateDoc(msgref, {
-        recievedTime: Timestamp.now()
-    });
+
+export async function setMessagesRecieved(chatId, messages) {
+    console.log(chatId, messages);
+    const promises = messages.map(async (msg) => {
+        const msgref = doc(db, "userChats", chatId, "messages", msg.id);
+        await updateDoc(msgref, {
+            recievedTime: Timestamp.now()
+        });
+    })
+    await Promise.all(promises);
+}
+export async function setMessagesSaw(chatId, messages) {
+    const promises = messages.map(async (msg) => {
+        const msgref = doc(db, "userChats", chatId, "messages", msg.id);
+        await updateDoc(msgref, {
+            sawTime: Timestamp.now()
+        });
+    })
+    await Promise.all(promises);
 }
 
-export async function setMsgSaw(chatId, msgId) {
-    const msgref = doc(db, "userChats", chatId, "messages", msgId);
-    await updateDoc(msgref, {
-        sawTime: Timestamp.now()
-    });
-}
+
 
 
 
@@ -200,68 +216,84 @@ export const respondChatRequest = async (user, user2Id, isApprove) => {
 
 
 
-export const listeners = {
-    userChatsUnsb: [],
-    currChatUnsb: null,
-    listenUserData: null,
+export const listenerUnsbs = {
+    userChats: [],
+    userData: null,
 }
 
 
 export const listenUserData = (user) => {
+    console.log('listen userData')
     const unsub = onSnapshot(doc(db, "users", user.id), (doc) => {
-        const currentData = doc.data();
-        console.log(currentData, "-----")
-        console.log(currentData.recievedRequestIds.length);
-        store.dispatch(updateUserData(currentData))
+        const currentUserData = doc.data();
+        const currentChatIds = currentUserData.chatIds;
+        const prevChatIds = store.getState().userData.value.chatIds;
+        console.log('listener!!')
+
+        const createdChatIds = currentChatIds.filter(cId => !prevChatIds.some(pId => pId === cId))
+        console.log(createdChatIds, 'createdChatIds')
+        if (createdChatIds.length != 0) {
+            console.log(createdChatIds, 'diff detected')
+            getNewUserChats(user, createdChatIds)
+        }
+        store.dispatch(updateUserData(currentUserData))
     });
-    listeners.listenUserData = unsub;
+    listenerUnsbs.userData = unsub;
 }
 
 export const lisetnUserChats = (user, userChatsData) => {
-    // listeners.userChatsUnsb.forEach(unsb => unsb())
+
+    listenerUnsbs.userChats.forEach(unsb => unsb())
+    listenerUnsbs.userChats = [];
 
     const { chatIds } = user;
-    const now = new Date().getTime();
+    console.log(chatIds, 'listenUserChats foo')
+
     chatIds.forEach(chatId => {
-        const q = query(
-            collection(db, "userChats", chatId, "messages"),
-            orderBy("sentTime"), startAt(now), limit(1)
-        );
-
-
-        const q2 = query(
-            collection(db, "userChats", chatId, "messages"),
-        );
-        const unsubscribe2 = onSnapshot(q2, async (querySnapshot) => {
-            const newData = await getNewMessage(store.getState().userChats.value[chatId], 1)
-            store.dispatch(updateMessagesById({
-                id: chatId,
-                data: newData
-            }))
+        console.log('added listener to', chatId)
+        const q3 = query(collection(db, "userChats", chatId, "messages"));
+        const unsubscribe = onSnapshot(q3, (snapshot) => {
+            snapshot.docChanges().forEach(async (change) => {
+                if (change.type === "added") {
+                    console.log('added message')
+                    const newMessageData = change.doc.data();
+                    const prevChatData = store.getState().userChats.value[chatId]
+                    if (prevChatData.messages.at(-1) == newMessageData.message) return;
+                    const newData = await getNewMessage(prevChatData, 1)
+                    console.log(newData);
+                    store.dispatch(updateMessagesById({
+                        id: chatId,
+                        data: newData
+                    }))
+                }
+            });
         });
-
-        listeners.userChatsUnsb.push(unsubscribe2);
+        listenerUnsbs.userChats.push(unsubscribe);
     })
 }
 
 
-
-
-
-const readMessages = async (user, chatData) => {
-    const messagesWillSaw = chatData.messages.filter(msg => msg.from !== user.id && msg.sawTime == null)
-    const promises = messagesWillSaw.map(msg => {
-        return setMsgSaw(chatData.id, msg.id);
+export const getNewUserChats = async (userData, createdChatIds) => {
+    console.log(createdChatIds)
+    const promises = createdChatIds.map(async (chatId) => {
+        console.log('map')
+        const chatData = await getDocData('userChats', chatId);
+        const user2Id = getUser2(userData, chatData.participants);
+        const messages = await getAllDocsData('userChats', chatId, 'messages');
+        const user2 = await getDocData('users', user2Id);
+        messages.forEach(msgData => resetTime(msgData));
+        chatData.messages = messages;
+        chatData.user2 = user2;
+        chatData.gotMsgNum = 0;
+        console.log(chatData)
+        console.log(store.getState().userChats.value)
+        store.dispatch(addNewChatToUserChats(chatData));
+        console.log('__&&&&^^^^^____--')
     })
+    await Promise.all(promises)
 
-    await Promise.all(promises);
-
-    const chatDoc = doc(db, "userChats", chatData.id);
-    const user2Id = getUser2(user, chatData.participants);
-    await updateDoc(chatDoc, {
-        [user2Id]: 0
-    })
 }
+
 
 
 async function getNewMessage(chatData, increment) {
@@ -271,6 +303,10 @@ async function getNewMessage(chatData, increment) {
         orderBy("sentTime", "asc"), limit(nextLimit),
     );
     const data = await getDocsWithQuery(q);
+    data.forEach(msgData => resetTime(msgData))
+    const userData = store.getState().userData;
+    const MessagesWillRecieve = data.filter(msg => (msg.from != userData.id && msg.recievedTime == null))
+    // setMessagesRecieved(chatData.id, MessagesWillRecieve);
     return data;
 }
 
@@ -289,20 +325,6 @@ async function getMoreMessages(chatData) {
 
 
 
-async function test() {
-
-    //orderBy kullanirken hata aldim. index olayi nedir?? google gecmise bak
-    // const ref = collection(db, "userChats", "Sp1jmKweg1TzUcJ8IxQ9Ay1JPo72982CUWtIc1S10TVAmJDj2FCMDno1", "messages");
-
-    // const q = query(
-    //     collection(db, "userChats","Sp1jmKweg1TzUcJ8IxQ9Ay1JPo72982CUWtIc1S10TVAmJDj2FCMDno1","messages"),where("from","==","Sp1jmKweg1TzUcJ8IxQ9Ay1JPo72"),
-    // )
-
-
-
-}
-
-test()
 
 export const searchUsersByName = async (user, userName) => {
     const q = query(collection(db, "users"), where(`displayName`, ">=", userName), orderBy("displayName"), where(`displayName`, "<=", userName + 'z'));

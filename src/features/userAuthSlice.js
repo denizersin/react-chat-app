@@ -5,45 +5,43 @@ import { firebaseAuth } from '../services/fbAuth';
 
 
 const initialState = {
-    user: undefined,
+    userAuth: undefined,
     status: 'none'
 };
 
 
-export const logIn = createAsyncThunk('user/logIn', async ({ email, password }) => {
-    const user = await firebaseAuth.login(email, password);
-    return user;
+export const logIn = createAsyncThunk('userAuth/logIn', async ({ email, password }) => {
+    const userAuth = await firebaseAuth.login(email, password);
+    return userAuth;
 })
 
-export const logOut = createAsyncThunk('user/logOut', async () => {
+export const logOut = createAsyncThunk('userAuth/logOut', async () => {
     console.log('asd')
-    const user = await firebaseAuth.logOut();
-    return user;
+    const userAuth = await firebaseAuth.logOut();
+    return userAuth;
 })
 
-export const register = createAsyncThunk('user/register', async ({ email, password, displayName, avatarUrl }) => {
-    const user = await firebaseAuth.register(email, password, displayName, avatarUrl);
-    return user;
+export const register = createAsyncThunk('userAuth/register', async ({ email, password, displayName, avatarUrl }) => {
+    const userAuth = await firebaseAuth.register(email, password, displayName, avatarUrl);
+    return userAuth;
 })
 
 
-export const checkUser = createAsyncThunk('user/checkUser', async () => {
+export const checkuserAuth = createAsyncThunk('userAuth/checkuserAuth', async () => {
     const response = await firebaseAuth.checkUser();
     return response
 })
 
-export const userSlice = createSlice({
-    name: 'user',
+export const userAuthSlice = createSlice({
+    name: 'userAuth',
     initialState,
     reducers: {
-        updateUserData: (state, action) => {
-            state.user.userData = action.payload;
-        },
+
     },
     extraReducers(builder) {
         builder
-            .addCase(checkUser.fulfilled, (state, action) => {
-                state.user = action.payload;
+            .addCase(checkuserAuth.fulfilled, (state, action) => {
+                state.userAuth = action.payload;
                 console.log(action.payload)
                 state.status = "succeeded"
                 setTimeout(() => {
@@ -51,7 +49,7 @@ export const userSlice = createSlice({
                 }, 10);
 
             })
-            .addCase(checkUser.pending, (state) => {
+            .addCase(checkuserAuth.pending, (state) => {
                 state.status = "loading"
                 setTimeout(() => {
                     store.dispatch(setLoading())
@@ -61,7 +59,7 @@ export const userSlice = createSlice({
                 state.status = "succeeded";
                 console.log(action, 'qweqwe')
                 console.log(action)
-                state.user = action.payload;
+                state.userAuth = action.payload;
                 setTimeout(() => {
                     store.dispatch(unSetLoading())
                 }, 10);
@@ -81,7 +79,7 @@ export const userSlice = createSlice({
             .addCase(register.fulfilled, (state, action) => {
                 state.status = "succeeded";
                 console.log(action.payload)
-                state.user = action.payload;
+                state.userAuth = action.payload;
                 setTimeout(() => {
                     store.dispatch(unSetLoading())
                 }, 10);
@@ -100,7 +98,7 @@ export const userSlice = createSlice({
             })
             .addCase(logOut.fulfilled, (state, action) => {
                 state.status = "succeeded";
-                state.user = null;
+                state.userAuth = null;
                 setTimeout(() => {
                     store.dispatch(unSetLoading())
                 }, 10);
@@ -123,5 +121,4 @@ export const userSlice = createSlice({
 })
 
 
-export const { updateUserData } = userSlice.actions;
-export default userSlice.reducer
+export default userAuthSlice.reducer

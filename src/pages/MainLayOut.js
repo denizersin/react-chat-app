@@ -5,8 +5,7 @@ import { Outlet, useNavigate } from 'react-router-dom'
 import LoadingModal from '../components/LoadingModal'
 import IsLoadingSlice from '../features/isLoadingSlice'
 import { store } from '../features/store'
-import { logOut } from '../features/userSlice'
-import Deneme from './Deneme'
+import { logOut } from '../features/userAuthSlice'
 
 export default function MainLayOut() {
     const navigate = useNavigate();

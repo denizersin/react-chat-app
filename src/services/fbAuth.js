@@ -2,6 +2,8 @@ import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWith
 import { addDoc, collection, doc, getDoc, setDoc } from "firebase/firestore";
 import toast from "react-hot-toast";
 import { dataModel } from "../constants";
+import { store } from "../features/store";
+import { updateUserData } from "../features/userDataSlice";
 import { createUser, firebase, getDocData } from "./fb";
 
 
@@ -26,9 +28,10 @@ const register = async (email, password, displayName, avatarUrl) => {
         await setDoc(doc(db, "users", newUser.user.uid), userData);
 
         toast.success('kayit oldun');
-        newUser.userData = userData;
+        store.dispatch(updateUserData(userData));
+        // newUser.userData = userData;
         // userData.firebaseUser = newUser
-        return newUser//userData
+        return { uid: newUser.user.uid };//userData
     }
     catch (err) {
         toast.error(err);
@@ -46,7 +49,10 @@ const login = async (email, password) => {
         toast.success("giris yapildi")
         console.log(user)
         const data = await getDocData("users", user.user.uid);
-        user.userData = data;
+        store.dispatch(updateUserData(data));
+        console.log(user)
+        // user.userData = data;
+        return { uid: user.id }
         return user;
     }
     catch (err) {
@@ -89,7 +95,8 @@ async function onAuthStateChangedPrm() {
                 console.log(user)
                 const userDoc = await getDocData('users', user.uid)
                 const newUser = { uid: user.uid };
-                newUser.userData = userDoc;
+                store.dispatch(updateUserData(userDoc));
+                // newUser.userData = userDoc;
                 resolve(newUser)
                 return newUser;
             } else {

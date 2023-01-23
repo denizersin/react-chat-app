@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { store } from '../features/store';
-import { register } from '../features/userSlice';
+import { register } from '../features/userAuthSlice';
 
 
 
@@ -19,12 +19,14 @@ export default function Register() {
     }
 
 
-    const user = useSelector(state => state.user.user);
     const navigate = useNavigate();
 
+    const userAuth = useSelector(state => state.userAuth);
     useEffect(() => {
-        if (user) navigate('/');
-    },);
+        if (userAuth.userAuth) {
+            navigate('/');
+        }
+    });
     return (
         <div className={'Login component'}> <span>Login</span>
             <form action="">

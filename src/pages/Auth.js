@@ -2,18 +2,16 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { store } from '../features/store';
-import { logIn } from '../features/userSlice';
+import { logIn } from '../features/userAuthSlice';
 
 export default function Auth() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const isValidate = email && password && password.length >= 8;
-
-    const user = useSelector(state => state.user.user);
     const navigate = useNavigate();
-
+    const userAuth = useSelector(state => state.userAuth);
     useEffect(() => {
-        if (user) {
+        if (userAuth.userAuth) {
             navigate('/');
         }
     });

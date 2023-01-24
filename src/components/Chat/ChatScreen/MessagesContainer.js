@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import Message from './Message';
 import "../../../styles/MessageContainer.css"
 function MessagesContainer({ selectedChatMsgLem }) {
+    console.log('Messages Container')
     let selectedChatId;
     useSelector(state => {
         selectedChatId = state.selectedChatId.value
@@ -20,4 +21,4 @@ function MessagesContainer({ selectedChatMsgLem }) {
     )
 }
 
-export default MessagesContainer
+export default (MessagesContainer);

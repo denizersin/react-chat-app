@@ -14,8 +14,6 @@ export const userChatSlice = createSlice({
     initialState,
     reducers: {
         updateChatsDataValue: (state, action) => {
-            setTime(action.payload);
-            console.log(action.payload);
             state.value = action.payload;
         },
         updateChatDataById: (state, action) => {
@@ -25,25 +23,27 @@ export const userChatSlice = createSlice({
             state.value[id] = data;
         },
         updateMessagesById: (state, action) => {
-            setTime(action.payload);
-
-            console.log(action.payload);
             const { id, data } = action.payload;
             state.value[id].messages = data;
         },
         addNewChatToUserChats: (state, action) => {
-            setTime(action.payload);
-
-            console.log(JSON.stringify(state.value));
-            console.log('addNewChatToUserChats', action.payload);
             const chatData = action.payload;
             state.value[chatData.id] = chatData;
+        },
+        updateAMessageById: (state, action) => {
+            const { chatId, id, data } = action.payload
+            console.log(action.payload)
+            console.log(action.payload.chatId)
+            console.log(JSON.stringify(Object.keys(state.value)), chatId)
+            const index = state.value[chatId].messages.findIndex(msgData => msgData.id == data.id)
+            state.value[chatId].messages[index] = data
+
         }
     },
 })
 
 
-export const { updateChatsDataValue, updateChatDataById, updateMessagesById, addNewChatToUserChats } = userChatSlice.actions
+export const { updateChatsDataValue, updateChatDataById, updateMessagesById, addNewChatToUserChats, updateAMessageById } = userChatSlice.actions
 export default userChatSlice.reducer
 
 
@@ -51,13 +51,13 @@ export default userChatSlice.reducer
 
 
 function setTime(obj) {
-    for (const [key, value] of Object.entries(obj)) {
-        if (value instanceof Object) {
-            setTime(value)
-        }
+    // for (const [key, value] of Object.entries(obj)) {
+    //     if (value instanceof Object) {
+    //         setTime(value)
+    //     }
 
-        if (key == 'sawTime' || key == "rescievedTime" || key == 'sentTime') {
-            obj[key] = 1;
-        }
-    }
+    //     if (key == 'sawTime' || key == "rescievedTime" || key == 'sentTime') {
+    //         obj[key] = 1;
+    //     }
+    // }
 }

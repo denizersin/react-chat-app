@@ -15,13 +15,10 @@ export default function Chat() {
     const selectedChatId = useSelector(state => state.selectedChatId.value);
     const fetchUserChats = async () => {
         const data = await getUserChats(userData);
-        console.log(data)
         store.dispatch(updateChatsDataValue(data))
     }
     let len = userChats === null ? 0 : Object.keys(userChats).length;
-    console.log(userChats instanceof Array)
     useEffect(() => {
-        console.log('1')
         if (userChats == null) {
             console.log('2')
             fetchUserChats()
@@ -41,13 +38,19 @@ export default function Chat() {
 
     if (userChats === null) {
         console.log('userCHats==null')
-        return (<></>)
+        return (<>
+            {console.log('asd')}
+        </>)
     }
-    console.log('Chat rendered')
+    console.log('chat last')
     return (
         <div className={'Chat component'}> <span>Chat</span>
-            <ChatsMenu />
-            {selectedChatId && <ChatScreen />}
+{   userChats!==null? (            <div>
+                <ChatsMenu />
+                {selectedChatId && <ChatScreen />}
+                {console.log('chat vdom')}
+            </div>):console.log('nulll')}
+
         </div>
     )
 }

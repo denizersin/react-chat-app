@@ -13,5 +13,9 @@ export const store = configureStore({
         userData: userDataReducer,
         selectedChatId: selectedChatIdReducer,
     },
+    middleware: (getDefaultMiddleware) =>  //!unserializable warning (important!) 
+        getDefaultMiddleware({
+            serializableCheck: false,
+        }),
 })
 

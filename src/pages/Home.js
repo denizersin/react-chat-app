@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Chat from '../components/Chat/Chat';
 // import Chat from '../components/Chat/Chat';
 import ChatRequests from '../components/ChatRequests';
+import CreateGroupForm from '../components/Group/CreateGroupForm';
 import { listeners, listenUserData } from '../services/fb';
 
 export default function Home() {
@@ -15,8 +16,8 @@ export default function Home() {
     console.log("rendered HOMe", userAuth)
     return (
         <div className={'Home com`ponent'}> <span>Home</span>
-        {"adasdsa"}
             <ChatRequests />
+            <CreateGroupForm />
             <Chat />
         </div>
     )

@@ -1,9 +1,9 @@
-import { serverTimestamp } from 'firebase/firestore';
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux';
 import { searchUsersByName } from '../../../services/fb';
+import RequestProvider from '../../RequestProvider';
+import UserProfile from '../../UserProfile';
 import ChatMenu from './ChatMenu';
-import SearchedUser from './SearchedUser';
 
 export default function ChatsMenu() {
     console.log('chatsMenu')
@@ -41,7 +41,10 @@ export default function ChatsMenu() {
         return (
             <React.Fragment key={resultData.id}>
                 {isAChat ? <ChatMenu key={resultData.id} chatData={resultData} /> :
-                    <SearchedUser key={resultData.id} user2Data={resultData} />
+                    // <SearchedUser key={resultData.id} user2Data={resultData} />
+                    (<UserProfile user={resultData}>
+                        <RequestProvider user={resultData} />
+                    </UserProfile>)
                 }
             </React.Fragment>
         )

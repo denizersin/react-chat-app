@@ -6,7 +6,7 @@ import { getAuth } from "firebase/auth";
 import toast from "react-hot-toast";
 import { dataModel, getMergedId, privMessageData } from "../constants";
 import { store } from "../features/store";
-import { addNewChatToUserChats, updateChatDataById, updateChatsDataValue, updateMessagesById } from "../features/userChatsSlice";
+import { addNewChatToUserChats, updateAMessageById, updateChatDataById, updateChatsDataValue, updateMessagesById } from "../features/userChatsSlice";
 import { updateUserData } from "../features/userDataSlice";
 
 export let hello = "asd";
@@ -53,9 +53,7 @@ export const createPrivChat = async (user, user2Id) => {
     await setDoc(doc(db, "userChats", chatId), {
         id: chatId,
         type: "private",
-        participants: [user.id, user2Id],
-        [user.id]: 0,
-        [user2Id]: 0,
+        participantIds: [user.id, user2Id],
     });
 
     await updateDoc(doc(db, "users", user.id), {
@@ -67,20 +65,50 @@ export const createPrivChat = async (user, user2Id) => {
     })
 
 }
+export const createGroupChat = async (groupData) => {
+    const groupChatDocRef = doc(collection(db, "userChats"));
+    const groupChatId = groupChatDocRef.id;
+    await setDoc(groupChatDocRef, {
+        id: groupChatId,
+        ...groupData
+    });
+    const { participantIds } = groupData
+    const promises = participantIds.map(userId => {
+        return updateDoc(doc(db, "users", userId), {
+            chatIds: arrayUnion(groupChatId)
+        })
+    })
+
+    await Promise.all(promises)
+}
 
 export const sendAMessage = async (user, chatId, messageData) => {
     const newDocRef = doc(collection(db, "userChats", chatId, "messages"));
-    await setDoc(
-        newDocRef,
-        {
-            ...dataModel.privMessageData,
-            ...messageData,
-            id: newDocRef.id, //set its id initiallay
-        }
-    )
+    const newMessageId = newDocRef.id;
+    try {
+        await setDoc(
+            newDocRef,
+            {
+                ...dataModel.privMessageData,
+                ...messageData,
+                id: newMessageId, //set its id initiallay
+            }
+        )
+        updateArrivalStatus(chatId, newMessageId, 'sent');
+        return true;
+    }
+    catch (e) {
+        return false
+    }
 }
 
+async function updateArrivalStatus(chatId, msgId, status) {
+    const msgRef = doc(db, 'userChats', chatId, 'messages', msgId)
+    updateDoc(msgRef, {
+        arrivalStatus: status
+    })
 
+}
 
 export async function getUsers(userIds) {
     const q = query(
@@ -107,7 +135,7 @@ export const getUserChats = async (user) => {
     const userChatsdata = {};
 
     const promises3 = chatsData.map(data => {
-        let user2Id = getUser2(user, data.participants)
+        let user2Id = getUser2(user, data.participantIds)
         userChatsdata[data.id] = data
         return getDocData("users", user2Id).then(userData => {
             userChatsdata[data.id].user2 = userData;
@@ -120,47 +148,65 @@ export const getUserChats = async (user) => {
     //set nested collection (messages)
     const promises = chatsData.map((data) => {
         data.messages = [];
-        let user2Id = getUser2(user, data.participants)
-        let unSawMessagesNum = data[user2Id];
+        let unSawMessagesNum = 1
         unSawMessagesNum = unSawMessagesNum < 50 ? 50 : unSawMessagesNum
         return getNewMessage(data, unSawMessagesNum).then(dataArr => {
-            dataArr.forEach(msgData => resetTime(msgData));
             data.messages = dataArr
             data.gotMsgNum = dataArr.length;
         })
     })
+    try {
+        await Promise.all(promises);
+        chatsData.forEach(chatData => {
+            const unRecievedMessages = chatData.messages.filter(msg => msg.from !== user.id && (msg.recievedTime === null));
+            unRecievedMessages.forEach(msgData => updateArrivalStatus(chatData.id, msgData.id, 'recieved'))
+        })
+    }
+    catch (e) {
 
-    await Promise.all(promises);
-
-
-    // const promises2 = chatsData.map(chatData => {
-    //     return chatData.messages.filter(msg => msg.from !== user.id && msg.recievedTime === null)
-    //         .map(msg => setMessagesRecieved(chatData.id, [msg]))
-    // })
+        console.log(e)
+    }
     return userChatsdata
-    return Object.values(userChatsdata);
 }
 
 
 
 export async function setMessagesRecieved(chatId, messages) {
-    console.log(chatId, messages);
+    const userId = store.getState().userData.value.id;
+    messages = messages.filter(msg => msg.from !== userId && (msg.recievedTime == null));
     const promises = messages.map(async (msg) => {
         const msgref = doc(db, "userChats", chatId, "messages", msg.id);
         await updateDoc(msgref, {
-            recievedTime: Timestamp.now()
+            recievedTime: Timestamp.now(),
         });
     })
-    await Promise.all(promises);
+    try {
+        await Promise.all(promises);
+        messages.forEach(msg => updateArrivalStatus(chatId, msg.id, 'recieved'));
+        return true
+    }
+    catch (e) {
+        console.log(e)
+        return false;
+    }
 }
 export async function setMessagesSaw(chatId, messages) {
+    messages = messages.filter(msg => (msg.sawTime == null));
     const promises = messages.map(async (msg) => {
         const msgref = doc(db, "userChats", chatId, "messages", msg.id);
         await updateDoc(msgref, {
-            sawTime: Timestamp.now()
+            sawTime: Timestamp.now(),
         });
     })
-    await Promise.all(promises);
+
+    try {
+        await Promise.all(promises);
+        messages.forEach(msg => updateArrivalStatus(chatId, msg.id, 'saw'));
+        return true
+    } catch (e) {
+        console.log(e)
+        return false;
+    }
 }
 
 
@@ -186,28 +232,56 @@ export const sendChatRequest = async (user, user2Id) => {
             { merge: true }
         );
         toast.success("basariyla istek atildi")
+        return true;
     }
     catch (e) {
         console.error(e)
+        return false;
     }
 }
 
 export const respondChatRequest = async (user, user2Id, isApprove) => {
-    const ref = doc(db, 'users', user.id);
-    await updateDoc(ref,
-        {
-            "recievedRequestIds": arrayRemove(user2Id)
-        },
-    );
-    const ref2 = doc(db, 'users', user2Id);
-    await updateDoc(ref2,
-        {
-            "sentRequestIds": arrayRemove(user.id)
-        },
-    );
-    if (!isApprove) return;
-    await createPrivChat(user, user2Id);
-    return;
+    try {
+        const ref = doc(db, 'users', user.id);
+        await updateDoc(ref,
+            {
+                "recievedRequestIds": arrayRemove(user2Id)
+            },
+        );
+        const ref2 = doc(db, 'users', user2Id);
+        await updateDoc(ref2,
+            {
+                "sentRequestIds": arrayRemove(user.id)
+            },
+        );
+        if (!isApprove) return;
+        await createPrivChat(user, user2Id);
+        return true;
+    }
+    catch {
+        return false;
+    }
+
+}
+export const cancelChatRequest = async (user, user2Id) => {
+    try {
+        const ref = doc(db, 'users', user.id);
+        await updateDoc(ref,
+            {
+                "sentRequestIds": arrayRemove(user2Id)
+            },
+        );
+        const ref2 = doc(db, 'users', user2Id);
+        await updateDoc(ref2,
+            {
+                "recievedRequestIds": arrayRemove(user.id)
+            },
+        );
+        return true;
+    }
+    catch {
+        return false;
+    }
 }
 
 
@@ -233,7 +307,6 @@ export const listenUserData = (user) => {
         const createdChatIds = currentChatIds.filter(cId => !prevChatIds.some(pId => pId === cId))
         console.log(createdChatIds, 'createdChatIds')
         if (createdChatIds.length != 0) {
-            console.log(createdChatIds, 'diff detected')
             getNewUserChats(user, createdChatIds)
         }
         store.dispatch(updateUserData(currentUserData))
@@ -247,7 +320,6 @@ export const lisetnUserChats = (user, userChatsData) => {
     listenerUnsbs.userChats = [];
 
     const { chatIds } = user;
-    console.log(chatIds, 'listenUserChats foo')
 
     chatIds.forEach(chatId => {
         console.log('added listener to', chatId)
@@ -255,16 +327,21 @@ export const lisetnUserChats = (user, userChatsData) => {
         const unsubscribe = onSnapshot(q3, (snapshot) => {
             snapshot.docChanges().forEach(async (change) => {
                 if (change.type === "added") {
-                    console.log('added message')
-                    const newMessageData = change.doc.data();
-                    const prevChatData = store.getState().userChats.value[chatId]
-                    if (prevChatData.messages.at(-1) == newMessageData.message) return;
+                    const prevChatsData = store.getState().userChats.value
+                    if (!prevChatsData) return
+                    const prevChatData = prevChatsData[chatId];
                     const newData = await getNewMessage(prevChatData, 1)
-                    console.log(newData);
+                    setMessagesRecieved(chatId, newData);
                     store.dispatch(updateMessagesById({
                         id: chatId,
                         data: newData
                     }))
+                    console.log('added')
+                }
+                if (change.type === "modified") {
+                    console.log('modified')
+                    const data = change.doc.data();
+                    store.dispatch(updateAMessageById({ chatId, id: data.id, data }))
                 }
             });
         });
@@ -274,21 +351,16 @@ export const lisetnUserChats = (user, userChatsData) => {
 
 
 export const getNewUserChats = async (userData, createdChatIds) => {
-    console.log(createdChatIds)
     const promises = createdChatIds.map(async (chatId) => {
-        console.log('map')
         const chatData = await getDocData('userChats', chatId);
-        const user2Id = getUser2(userData, chatData.participants);
+        const user2Id = getUser2(userData, chatData.participantIds);
         const messages = await getAllDocsData('userChats', chatId, 'messages');
         const user2 = await getDocData('users', user2Id);
         messages.forEach(msgData => resetTime(msgData));
         chatData.messages = messages;
         chatData.user2 = user2;
         chatData.gotMsgNum = 0;
-        console.log(chatData)
-        console.log(store.getState().userChats.value)
         store.dispatch(addNewChatToUserChats(chatData));
-        console.log('__&&&&^^^^^____--')
     })
     await Promise.all(promises)
 
@@ -303,24 +375,9 @@ async function getNewMessage(chatData, increment) {
         orderBy("sentTime", "asc"), limit(nextLimit),
     );
     const data = await getDocsWithQuery(q);
-    data.forEach(msgData => resetTime(msgData))
-    const userData = store.getState().userData;
-    const MessagesWillRecieve = data.filter(msg => (msg.from != userData.id && msg.recievedTime == null))
-    // setMessagesRecieved(chatData.id, MessagesWillRecieve);
     return data;
 }
 
-//as scroll sideEffect
-async function getMoreMessages(chatData) {
-    const nextLimit = chatData.length + 50;
-    const q = query(
-        collection(db, "userChats", chatData.id, "messages"),
-        orderBy("sentTime", "asc"), limit(nextLimit)
-    );
-    const data = await getDocsWithQuery(q);
-
-    return data;
-}
 
 
 
@@ -343,8 +400,8 @@ async function getNestedData(...args) {  //! yapilabilir..
 
 //!utils
 
-function getUser2(user, participants) {
-    return participants.find(u => u != user.id);
+function getUser2(user, participantIds) {
+    return participantIds.find(u => u != user.id);
 }
 async function getAllDocsData(...args) {
     const querySnapshot = await getDocs(collection(db, ...args));

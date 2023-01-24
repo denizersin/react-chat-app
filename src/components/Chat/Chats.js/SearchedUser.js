@@ -1,8 +1,7 @@
 import React from 'react'
 import { useSelector } from 'react-redux';
 import { sendChatRequest } from '../../../services/fb';
-
-export default function SearchedUser({ user2Data }) {
+function SearchedUser({ user2Data }) {
 
 
     let userData;

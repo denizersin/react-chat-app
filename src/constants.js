@@ -1,4 +1,3 @@
-import { Timestamp } from "firebase/firestore"
 
 export const privMessageData = {
     from: null,//*
@@ -9,7 +8,8 @@ export const privMessageData = {
     sawTime: null,//*      //time
     images: [],
     sticker: null,
-    replyId: null
+    replyId: null,
+    arrivalStatus: 'sending'
 }
 
 const userData = {

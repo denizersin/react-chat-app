@@ -13,10 +13,14 @@ export default function ChatMenu({ chatData }) {
     const lastMessage = chatData.messages.at(-1);
     return (
         <div onClick={handleClickMenu} className={'ChatMenu component'}> <span>ChatMenu</span>
-            {chatData.user2.displayName+'  '}
+            {chatData.type == 'private' ?
+                (chatData.user2.displayName) :
+                (chatData.groupName)
+            }
             {
                 lastMessage ?
-                    (`${lastMessage.from == user.id ?user.displayName : chatData.user2.displayName} ` + ": " + lastMessage.message) :
+                    (`  ${chatData.participantsMap[lastMessage.from].displayName} ` + ": " + lastMessage.message)
+                    :
                     ('say hi')
             }
         </div>

@@ -8,9 +8,9 @@ export default function Message({ msg, chatData }) {
     useSelector(state => {
         userData = state.userData.value
     })
-    const msgOwner = msg.from == userData.id ? userData : chatData.user2
+    let msgOwner = chatData.participantsMap[msg.from];
 
-    if (msgOwner != userData && msg.sawTime == null) {
+    if (msgOwner != userData && msg.arrivalStatus != 'saw' && chatData.type !== 'group') {
         setMessagesSaw(chatData.id, [msg]);
     }
 

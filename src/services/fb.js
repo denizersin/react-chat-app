@@ -46,9 +46,16 @@ const auth = getAuth();
 
 export const firebase = { app, db, auth }
 
-
+const canCreateNewChat = () => {
+    if (store.getState().userData.value.chatIds.length >= 4) {
+        toast.error(`you have reached the maximum number you can have`)
+        return false;
+    }
+    return true;
+}
 
 export const createPrivChat = async (user, user2Id) => {
+    if (!canCreateNewChat()) return;
     const chatId = getMergedId(user.id, user2Id);
     await setDoc(doc(db, "userChats", chatId), {
         id: chatId,
@@ -65,7 +72,11 @@ export const createPrivChat = async (user, user2Id) => {
     })
 
 }
+
+
+
 export const createGroupChat = async (groupData) => {
+    if (!canCreateNewChat()) return;
     const groupChatDocRef = doc(collection(db, "userChats"));
     const groupChatId = groupChatDocRef.id;
     await setDoc(groupChatDocRef, {
@@ -78,8 +89,12 @@ export const createGroupChat = async (groupData) => {
             chatIds: arrayUnion(groupChatId)
         })
     })
-
-    await Promise.all(promises)
+    try {
+        await Promise.all(promises)
+        toast.success('grup basariyla olusturuldu')
+    } catch (error) {
+        toast.error(error)
+    }
 }
 
 export const sendAMessage = async (user, chatId, messageData) => {
@@ -134,22 +149,41 @@ export const getUserChats = async (user) => {
     //! generate userChatsData[chatId]=chatData;
     const userChatsdata = {};
 
-    const promises3 = chatsData.map(data => {
-        let user2Id = getUser2(user, data.participantIds)
-        userChatsdata[data.id] = data
-        return getDocData("users", user2Id).then(userData => {
-            userChatsdata[data.id].user2 = userData;
-        })
+    const promises3 = chatsData.map(chatData => {
+        userChatsdata[chatData.id] = chatData
+        chatData.participantsMap = {}
+
+        if (chatData.type == 'group') {
+            return chatData.participantIds.map(uid =>
+            (getDocData('users', uid)
+                .then(userDoc => {
+                    chatData.participantsMap[uid] = userDoc
+                })))
+        }
+        if (chatData.type == 'private') {
+            let user2Id = getUser2(user, chatData.participantIds)
+            return getDocData("users", user2Id).then(userData => {
+                userChatsdata[chatData.id].user2 = userData;
+                userChatsdata[chatData.id].participantsMap[user2Id] = userData;
+                userChatsdata[chatData.id].participantsMap[user.id] = user;
+            })
+        }
+
     })
 
-    await Promise.all(promises3);
+    await Promise.all(promises3.flat());
 
 
     //set nested collection (messages)
-    const promises = chatsData.map((data) => {
-        data.messages = [];
-        let unSawMessagesNum = 1
-        unSawMessagesNum = unSawMessagesNum < 50 ? 50 : unSawMessagesNum
+    const promises = chatsData.map(async (data) => {
+        const unSawMessages = await getUnSawMessages(data);
+        data.messages = unSawMessages;
+        data.gotMsgNum = unSawMessages.length;
+        let unSawMessagesNum = unSawMessages.length
+        // if (unSawMessagesNum > 5) {
+        //     return;
+        // }
+        unSawMessagesNum = 50;
         return getNewMessage(data, unSawMessagesNum).then(dataArr => {
             data.messages = dataArr
             data.gotMsgNum = dataArr.length;
@@ -208,8 +242,6 @@ export async function setMessagesSaw(chatId, messages) {
         return false;
     }
 }
-
-
 
 
 
@@ -313,7 +345,7 @@ export const listenUserData = (user) => {
     });
     listenerUnsbs.userData = unsub;
 }
-
+let messagesListenerCounter = 0;
 export const lisetnUserChats = (user, userChatsData) => {
 
     listenerUnsbs.userChats.forEach(unsb => unsb())
@@ -327,6 +359,10 @@ export const lisetnUserChats = (user, userChatsData) => {
         const unsubscribe = onSnapshot(q3, (snapshot) => {
             snapshot.docChanges().forEach(async (change) => {
                 if (change.type === "added") {
+                    const debug = store.getState().userChats.value[chatId].messages
+                        .some(msg => msg.id == change.doc.data().id);
+                    let debug2 = Timestamp.now().seconds - change.doc.data().sentTime.seconds > 2000
+                    if (debug || debug2) return;
                     const prevChatsData = store.getState().userChats.value
                     if (!prevChatsData) return
                     const prevChatData = prevChatsData[chatId];
@@ -337,6 +373,7 @@ export const lisetnUserChats = (user, userChatsData) => {
                         data: newData
                     }))
                     console.log('added')
+
                 }
                 if (change.type === "modified") {
                     console.log('modified')
@@ -367,6 +404,19 @@ export const getNewUserChats = async (userData, createdChatIds) => {
 }
 
 
+
+export async function getUnSawMessages(chatData) {
+    const user = store.getState().userData;
+
+    const q = query(
+        collection(db, "userChats", chatData.id, "messages"),
+        where("arrivalStatus", "!=", "saw")
+    );
+    const data = await getDocsWithQuery(q);
+    data.filter(msg => msg.from != user.id);
+    data.sort((a, b) => a.sentTime - b.sentTime);
+    return data;
+}
 
 async function getNewMessage(chatData, increment) {
     const nextLimit = chatData.messages.length + increment;

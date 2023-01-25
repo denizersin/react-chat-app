@@ -27,6 +27,7 @@ export default function Chat() {
     }, [userChats]);
 
     useEffect(() => {
+        if (userChats == null) return;
         lisetnUserChats(userData)
     }, [len]);
 
@@ -45,11 +46,11 @@ export default function Chat() {
     console.log('chat last')
     return (
         <div className={'Chat component'}> <span>Chat</span>
-{   userChats!==null? (            <div>
+            {userChats !== null ? (<div>
                 <ChatsMenu />
                 {selectedChatId && <ChatScreen />}
                 {console.log('chat vdom')}
-            </div>):console.log('nulll')}
+            </div>) : console.log('nulll')}
 
         </div>
     )

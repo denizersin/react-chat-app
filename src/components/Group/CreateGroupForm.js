@@ -7,6 +7,7 @@ import SelectProvider from './SelectProvider';
 
 export default function CreateGroupForm() {
     const user = store.getState().userData.value;
+    
     const [searchedVal, setSearchedVal] = useState('');
     const [groupForm, setGroupForm] = useState({ groupName: '' });
     const [selectedUsers, setSelectedUsers] = useState([]);
@@ -17,6 +18,12 @@ export default function CreateGroupForm() {
     const [searchUserResult, setSearchUserResult] = useState([]);
 
 
+    const resetStates = () => {
+        setSearchedVal('');
+        setSelectedUsers([])
+        setSearchUserResult([])
+        setGroupForm({ groupName: "" })
+    }
 
     const handleSearchUser = async (e) => {
         const result = await searchUsersByName({}, searchedVal)
@@ -27,6 +34,7 @@ export default function CreateGroupForm() {
     }
 
     const handleCreateNewGroup = async (e) => {
+
         const groupData = {
             type: 'group',
             participantIds: [user.id, ...selectedUsers.map(u => u.id)],
@@ -34,14 +42,13 @@ export default function CreateGroupForm() {
             groupName: 'groupName'
         }
         await createGroupChat(groupData);
+        resetStates();
     }
-    const hasSelected = selectedUsers.length != 0
+
+    const validataGroupForm = selectedUsers.length != 0 && groupForm.groupName
     return (
         <div className={'CreateGroupForm component'}> <span>CreateGroupForm</span>
-            {hasSelected ?
-                (<button onClick={handleCreateNewGroup}>create new group</button>)
-                :
-                ('select users')}
+            {(<button disabled={!validataGroupForm} onClick={handleCreateNewGroup}>create new group</button>)}
             <div>group definitions(form)
                 <label htmlFor="">group name:</label>
                 <input type="text"
@@ -57,7 +64,7 @@ export default function CreateGroupForm() {
             </div>
             <div>
                 <input type="text" value={searchedVal} onChange={(e) => setSearchedVal(e.target.value)} />
-                <button onClick={handleSearchUser}>search user</button>
+                <button onClick={handleSearchUser}>search users</button>
             </div>
 
             <div>

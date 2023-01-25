@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { searchUsersByName } from '../../../services/fb';
 import RequestProvider from '../../RequestProvider';
@@ -38,13 +38,16 @@ export default function ChatsMenu() {
 
     const renderedChatMenus = menuResult.map(resultData => {
         const isAChat = resultData.hasOwnProperty("type")
+        console.log(resultData,'()*(*')
         return (
             <React.Fragment key={resultData.id}>
                 {isAChat ?
-                    (<ChatMenu key={resultData.id} chatData={resultData} />) :
+                    (<ChatMenu key={resultData.id} chatData={resultData} />)
+                    :
                     (<UserProfile user={resultData}>
                         <RequestProvider user={resultData} />
-                    </UserProfile>)
+                    </UserProfile>
+                    )
                 }
             </React.Fragment>
         )
@@ -53,6 +56,8 @@ export default function ChatsMenu() {
     const handleSearch = (e) => {
         fetchUser();
     }
+
+
     return (
         <div className={'ChatsMenu component'}> <span>ChatsMenu</span>
             <div>

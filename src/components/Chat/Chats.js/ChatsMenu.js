@@ -40,8 +40,8 @@ export default function ChatsMenu() {
         const isAChat = resultData.hasOwnProperty("type")
         return (
             <React.Fragment key={resultData.id}>
-                {isAChat ? <ChatMenu key={resultData.id} chatData={resultData} /> :
-                    // <SearchedUser key={resultData.id} user2Data={resultData} />
+                {isAChat ?
+                    (<ChatMenu key={resultData.id} chatData={resultData} />) :
                     (<UserProfile user={resultData}>
                         <RequestProvider user={resultData} />
                     </UserProfile>)

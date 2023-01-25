@@ -29,7 +29,7 @@ export default function CreateGroupForm() {
     const handleCreateNewGroup = async (e) => {
         const groupData = {
             type: 'group',
-            paricipantIds: selectedUsers.map(u => u.id),
+            participantIds: [user.id, ...selectedUsers.map(u => u.id)],
             admins: [user.id],
             groupName: 'groupName'
         }

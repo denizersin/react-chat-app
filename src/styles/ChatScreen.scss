@@ -1,56 +1,87 @@
 .ChatScreen {
+    width: 100%;
+    height: 100%;
+
     >.chat-screen {
+        height: 100%;
         display: flex;
         flex-direction: column;
-        width: 100%;
-        height: 96vh;
 
         >div {
-            transition: height .3s linear;
+            transition: height .2s ease;
+
+        }
+
+        >.PrivChatInfo,
+        >.GroupChatInfo {
+            flex-shrink: 0;
+            flex-grow: 0;
         }
 
         >.MessagesContainer {
-            height: 580px;
-
-            flex-shrink: 0;
+            height: 700px;
+            flex-shrink: 1;
+            flex-grow: 0;
         }
 
-        >.MessagesContainer.active {
-            height: 300px;
-        }
-
-        >.MessageForm>.MessageForm {
-            height: 65px;
+        >.MessageForm {
             width: 100%;
             display: flex;
-            transition: all .3s linear;
-            .r1 {
-                height: 0px;
+            height: 60px;
+            flex-grow: 1;
+
+            >.MessageForm {
+                width: 100%;
+                height: 60px;
+                display: flex;
                 flex-grow: 1;
-                overflow: hidden;
+                flex-direction: column;
+                transition: all .2s ease;
+
+                .r1 {
+                    height: 0px;
+                    flex-grow: 1;
+                }
+
+                .r2 {
+                    height: 60px;
+                    flex-grow: 0;
+                    flex-shrink: 0;
+
+                    >.input {
+                        flex-shrink: 1;
+                    }
+                }
             }
-            .r2{
-                flex-grow: 0;
-                height: 65px;
-                
-            }
+        }
+
+
+
+        >.MessagesContainer.active+.MessageForm {
+            background-color: antiquewhite;
+            height: 220px;
         }
 
         >.MessageForm>.MessageForm.active {
-            height: 350px;
-            >.r1.assets {
-                height: 200px;
+            height: 220px;
+
+            >.r.r1 {
+                height: 120px;
+                flex-grow: 1;
             }
 
-            >.r2 {
-                >.c.emoji {
-                    background-color: rgba(128, 128, 128, 0.607);
-                }
+            >.r.r2 {
+                height: 60px;
+                flex-grow: 0;
 
                 >.c1,
                 >.c3,
                 >.c4 {
                     width: 35px;
+                }
+
+                .c.emoji {
+                    background-color: rgb(26, 32, 34);
                 }
             }
         }
@@ -64,7 +95,9 @@
 
         >.MessagesContainer {}
 
-        >.MessageForm {}
+        >.MessageForm {
+            >.MessageForm {}
+        }
     }
 
     >.chat-screen.GroupChatScreen {
@@ -74,6 +107,8 @@
 
         >.MessagesContainer {}
 
-        >.MessageForm {}
+        >.MessageForm {
+            >.MessageForm {}
+        }
     }
 }

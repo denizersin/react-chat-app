@@ -1,5 +1,5 @@
 import { async } from '@firebase/util';
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { createParticipantIdsMap, groupArrivalData } from '../../constants';
 import { store } from '../../features/store';
 import { getUserDataVal } from '../../features/userDataSlice';
@@ -8,6 +8,8 @@ import UserProfile from '../UserProfile';
 import SelectProvider from './SelectProvider';
 
 import "../../styles/CreateGroupForm.css"
+import { setOpenAnim1 } from '../..';
+import { AiOutlineArrowLeft } from 'react-icons/ai';
 export default function CreateGroupForm({ isActive, toggleCreateGroup }) {
     const userData = getUserDataVal();
 
@@ -53,10 +55,17 @@ export default function CreateGroupForm({ isActive, toggleCreateGroup }) {
         resetStates();
         toggleCreateGroup();
     }
-
+    const containerRef = useRef();
+    useEffect(() => {
+        if (isActive == true) {
+            setOpenAnim1(containerRef.current);
+        }
+    }, [isActive]);
     const validataGroupForm = selectedUsers.length != 0 && groupForm.groupName
     return (
-        <div className={'CreateGroupForm component'}> <span>CreateGroupForm</span>
+        <div className={'CreateGroupForm component'}
+            ref={containerRef}
+        > <span>CreateGroupForm</span>
             <div className="create">
                 {(<button disabled={!validataGroupForm} onClick={handleCreateNewGroup}>create new group</button>)}
             </div>
@@ -88,7 +97,9 @@ export default function CreateGroupForm({ isActive, toggleCreateGroup }) {
 
 
 
-            <div onClick={toggleCreateGroup} className="close">X</div>
+            <div onClick={toggleCreateGroup} className="close">
+                <AiOutlineArrowLeft />
+            </div>
         </div>
     )
 }

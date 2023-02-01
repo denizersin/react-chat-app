@@ -37,7 +37,7 @@ function MessagesContainer({ chatData, activeEmoji }) {
                 (messages[i].from !== userData.id) &&
                 (messages[i + 1]?.from === undefined || (messages[i + 1].from === userData.id)))
         return (
-            <>
+            <div key={msg.id} className='msg'>
                 {msg.type == 'text' &&
                     <Message key={msg.id} msg={msg} chatData={chatData} isNewUser2Msg={isNewUser2Msg} >
                         <Text msg={msg} chatData={chatData} />
@@ -47,8 +47,7 @@ function MessagesContainer({ chatData, activeEmoji }) {
                         <Images key={msg.id} imagesUrl={msg.imagesUrl} chatData={chatData} />
                     </Message>}
                 {msg.type == 'activite' && <div className='activite'><span>{msg.text}</span></div>}
-
-            </>
+            </div>
         )
 
     })

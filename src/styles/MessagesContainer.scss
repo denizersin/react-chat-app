@@ -3,9 +3,10 @@
     flex-direction: column-reverse;
     height: 580px;
     overflow-y: scroll;
+    overflow-x: hidden;
     gap: 3px;
 
-    >.Message {
+    >.msg>.Message {
         width: 100%;
         display: flex;
         flex-direction: column;
@@ -60,7 +61,7 @@
 
                 >.time-arrival {
                     display: flex;
-                    justify-content: center;
+                    justify-content: flex-end;
                     align-items: center;
                     font-size: .8em;
 
@@ -96,9 +97,13 @@
                 border-bottom-right-radius: 0px;
             }
         }
+
+        &.anim{
+            animation: scale-anim .2s cubic-bezier(0.075, 0.82, 0.165, 1);
+        }
     }
 
-    >.activite {
+    >.msg>.activite {
         display: flex;
         justify-content: center;
         align-items: center;

@@ -17,7 +17,7 @@ export const Groups = () => {
     }, [groupChatsData.length]);
 
     console.log(getGroupChatsVal())
-const toggleCreateGroup = () => {
+    const toggleCreateGroup = () => {
         setIsActive(prev => !prev);
     }
 
@@ -26,7 +26,7 @@ const toggleCreateGroup = () => {
             <div className="header">
                 Chatrooms
                 <button onClick={toggleCreateGroup} className='create-group'>+</button>
-                {isActive && <CreateGroupForm toggleCreateGroup={toggleCreateGroup}/>}
+                {isActive && <CreateGroupForm isActive={isActive} toggleCreateGroup={toggleCreateGroup} />}
             </div>
             <div className='group-menu'>
                 {groupChatsData.map(chatData => (

@@ -1,25 +1,17 @@
-.MessageForm {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
+.MessageForm > .MessageForm {
   background-color: #3F4E4F;
 }
 
-.MessageForm > .r {
-  -webkit-transition: all .2s ease-out;
-  transition: all .2s ease-out;
+.MessageForm > .MessageForm > .r {
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
 }
 
-.MessageForm > .r.r1 {
-  height: 0px;
-  width: 100%;
+.MessageForm > .MessageForm > .r.r1 {
+  overflow: hidden;
 }
 
-.MessageForm > .r.r1 > .Emojies {
+.MessageForm > .MessageForm > .r.r1 > .Emojies {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -27,7 +19,7 @@
       flex-wrap: wrap;
 }
 
-.MessageForm > .r.r1 > .Emojies > .emoji {
+.MessageForm > .MessageForm > .r.r1 > .Emojies > .emoji {
   width: 40px;
   height: 40px;
   font-size: 1.3em;
@@ -43,11 +35,11 @@
   cursor: pointer;
 }
 
-.MessageForm > .r.r1 > .Emojies > .emoji:hover {
+.MessageForm > .MessageForm > .r.r1 > .Emojies > .emoji:hover {
   background-color: gainsboro;
 }
 
-.MessageForm > .r2 {
+.MessageForm > .MessageForm > .r2 {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -59,14 +51,15 @@
           align-items: center;
   width: 100%;
   gap: 2px;
+  background-color: #3F4E4F;
 }
 
-.MessageForm > .r2 > .c {
+.MessageForm > .MessageForm > .r2 > .c {
   width: 0px;
   overflow: hidden;
   cursor: pointer;
-  -webkit-transition: all .2s ease-out;
-  transition: all .2s ease-out;
+  -webkit-transition: all .2s ease;
+  transition: all .2s ease;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -77,38 +70,41 @@
       -ms-flex-align: center;
           align-items: center;
   height: 35px;
-  border-radius: 5px;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
 }
 
-.MessageForm > .r2 > .c:hover {
+.MessageForm > .MessageForm > .r2 > .c:hover {
   background-color: rgba(128, 128, 128, 0.607);
 }
 
-.MessageForm > .r2 > .c.emoji {
+.MessageForm > .MessageForm > .r2 > .c.emoji {
   width: 35px;
 }
 
-.MessageForm > .r2 > .c.attach {
+.MessageForm > .MessageForm > .r2 > .c.attach {
   width: 35px;
 }
 
-.MessageForm > .r2 > .c.attach > svg {
+.MessageForm > .MessageForm > .r2 > .c.attach > svg {
   font-size: 25px;
 }
 
-.MessageForm > .r2 > .c.input {
+.MessageForm > .MessageForm > .r2 > .c.input {
   width: 760px;
   -webkit-box-flex: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
+  -ms-flex-negative: 1;
+      flex-shrink: 1;
 }
 
-.MessageForm > .r2 > .c.input > input {
+.MessageForm > .MessageForm > .r2 > .c.input > input {
   width: 97%;
   height: 30px;
 }
 
-.MessageForm > .r2 > .c.send-message {
+.MessageForm > .MessageForm > .r2 > .c.send-message {
   -webkit-box-flex: .1;
       -ms-flex-positive: .1;
           flex-grow: .1;
@@ -116,12 +112,12 @@
   padding: 5px;
 }
 
-.MessageForm > .r2 > .c.send-message > button {
+.MessageForm > .MessageForm > .r2 > .c.send-message > button {
   width: 100%;
   height: 35px;
   cursor: pointer;
 }
 
-.MessageForm > .r2 > .c svg {
+.MessageForm > .MessageForm > .r2 > .c svg {
   font-size: 30px;
 }

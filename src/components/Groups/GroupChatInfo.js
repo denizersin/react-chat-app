@@ -1,15 +1,21 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { getSelectedChatIdVal } from '../../features/selectedChatIdSLice';
 import '../../styles/GroupChatInfo.css'
+import GroupInfoScreen from './GroupInfo/GroupInfoScreen';
 export default function GroupChatInfo({ chatData }) {
-
-    const handleOpenGroupInfo = (e) => {
-
+    const selectedId = getSelectedChatIdVal();
+    const [activeGroupIfo, setActiveGroupIfo] = useState(false);
+    const toggleActiveGroupInfo = (e) => {
+        setActiveGroupIfo(prev => !prev);
     }
+    useEffect(() => {
+        setActiveGroupIfo(false);
+    }, [selectedId]);
     const participants = Object.values(chatData.participantsMap);
     const max = 6; //index so 7
     return (
 
-        <div onClick={handleOpenGroupInfo} className={'GroupChatInfo component'}> <span>GroupChatInfo</span>
+        <div onClick={toggleActiveGroupInfo} className={'GroupChatInfo component'}> <span>GroupChatInfo</span>
             <div className="group-name">{chatData.groupName}</div>
             <div className="avatars">
                 {participants.map((user, i) => {
@@ -25,6 +31,7 @@ export default function GroupChatInfo({ chatData }) {
                     )
                 })}
             </div>
+            {activeGroupIfo && <GroupInfoScreen activeGroupIfo={activeGroupIfo} chatData={chatData} />}
         </div>
     )
 }

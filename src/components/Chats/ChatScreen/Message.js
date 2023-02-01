@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { store } from '../../../features/store';
 import { getUserDataVal } from '../../../features/userDataSlice';
@@ -10,15 +10,21 @@ export default function Message({ msg, chatData, children, isNewUser2Msg }) {
     children = children instanceof Array ? children : [children];
     let userData = getUserDataVal();
 
+
     let msgOwner = chatData.participantsMap[msg.from];
     if (msgOwner.id != userData.id && msg.arrivalStatus !== 'saw' && chatData.type !== 'group') {
-        console.log('ee',msg)
+        console.log('ee', msg)
         setMessagesSaw(chatData.id, [msg]);
     }
     const senTime = new Date(msg.sentTime.seconds * 1000)
     const time = `${senTime.getHours()}:${senTime.getMinutes()}`
+    const ref = useRef();
+    useEffect(() => {
+        console.log('e')
+        ref.current.classList.add('anim')
+    }, []);
     return (
-        <div className={`Message component ${msg.from == userData.id ? "user1" : "user2"}`}> <span>Message</span>
+        <div className={`Message component ${msg.from == userData.id ? "user1" : "user2"}`} ref={ref}> <span>Message</span>
             <div className={`msg ${msg.from == userData.id ? "user1" : "user2"}`}>
                 <div className="c c1">
                     {isNewUser2Msg && <img src={msgOwner.avatarUrl} alt="" />}

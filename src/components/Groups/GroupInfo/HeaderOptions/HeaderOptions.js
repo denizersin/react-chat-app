@@ -14,15 +14,15 @@ export default function HeaderOptions({ chatData }) {
         <div className={'HeaderOptions component'}> <span>HeaderOptions</span>
             {userPermissionsMap['add-user'] &&
                 <Option handleOptionClick={handleAddUser}>
-                    <div className='add-user'>
-                        {'add user ' + 'icon'}
+                    <div className='add-user button-34'>
+                        {'add user'}
                     </div>
                 </Option>
             }
             {userPermissionsMap['delete-group'] &&
                 <Option handleOptionClick={handleRemoveUser}>
-                    <div className='delete=group'>
-                        {'deleteGroup ' + 'icon'}
+                    <div className='delete-group button-34 '>
+                        {'delete group'}
                     </div>
                 </Option>
             }

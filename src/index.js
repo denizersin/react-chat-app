@@ -25,3 +25,10 @@ root.render(
 );
 
 
+export function setOpenAnim1(elem) {
+  elem.classList.remove('open-anim1');
+  setTimeout(() => {
+    elem.classList.add('open-anim1');
+
+  }, 0);
+}

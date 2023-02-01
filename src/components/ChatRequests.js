@@ -1,7 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { getUsers, respondChatRequest } from '../services/fb';
 import UserProfile from './UserProfile';
+import "../styles/ChatRequests.css"
+import { setOpenAnim1 } from '..';
+import { AiOutlineArrowLeft } from 'react-icons/ai';
+
+
+
 
 export default function ChatRequests({ isActive, setIsActive }) {
     const userData = useSelector(state => state.userData.value);
@@ -26,8 +32,17 @@ export default function ChatRequests({ isActive, setIsActive }) {
         await respondChatRequest(userData, user2.id, isApprove)
 
     }
+
+    const containerRef = useRef();
+    useEffect(() => {
+        if (isActive == true) {
+            setOpenAnim1(containerRef.current)
+        }
+
+    }, [isActive]);
+
     return (
-        <div className={'ChatRequests component ' + `${isActive ? 'active' : ''}`}> <span>ChatRequests</span>
+        <div ref={containerRef} className={'ChatRequests component ' + `${isActive ? 'active' : ''}`}> <span>ChatRequests</span>
             {requests.map(rUser => {
                 return (
                     <UserProfile user={rUser}>
@@ -39,7 +54,9 @@ export default function ChatRequests({ isActive, setIsActive }) {
 
                 )
             })}
-            <div onClick={() => setIsActive(prev => !prev)} className="close">X</div>
+            <div onClick={() => setIsActive(prev => !prev)} className="close">
+                <AiOutlineArrowLeft />
+            </div>
         </div>
     )
 }

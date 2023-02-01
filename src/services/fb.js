@@ -287,7 +287,6 @@ export const getGroupChats = async (user) => {
     return userGroupsData;
 
 }
-
 export async function setMessagesRecieved(chatId, messages) {
     const userId = store.getState().userData.value.id;
     messages = messages.filter(msg => msg.from !== userId && (msg.recievedTime == null));
@@ -517,11 +516,14 @@ export const listenUserGroupChats = (user) => {
         listenerUnsbs.userGroupChats.push(unsubscribe);
     })
 }
+export const updateGroupData = (groupData, newData) => {
 
+}
 export const listenUserGroupChatsData = (user) => {
     listenerUnsbs.userGroupsData.forEach(unsb => unsb());
     listenerUnsbs.userGroupsData = [];
     const { groupChatIds } = user;
+    if (groupChatIds.length==0) return;
     const q3 = query(collection(db, "groupChats"), where("id", "in", groupChatIds));
     const unsubscribe = onSnapshot(q3, (snapshot) => {
         snapshot.docChanges().forEach(async (change) => {

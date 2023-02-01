@@ -28,23 +28,23 @@ export default function ParticipantOptions({ user2, chatData }) {
                 userPermissionsMap['assign-role'] &&
                 (participantRole !== 'admin' ?
                     <Option handleOptionClick={(e) => handleAssignRole(e, 'admin')}>
-                        {<div>make admin</div>}
+                        {<div className='make-admin button-34'>make admin</div>}
                     </Option>
                     :
                     <Option handleOptionClick={(e) => handleAssignRole(e, 'normal')}>
-                        {<div>dismiss as admin</div>}
+                        {<div className='dismiss-admin button-34'>dismiss as admin</div>}
                     </Option>)
             }
             {
                 userPermissionsMap['remove-user'] &&
                 <Option handleOptionClick={handleRemoveUser}>
-                    {<div>remove user</div>}
+                    {<div className='remove-user button-34'>remove user</div>}
 
                 </Option>
             }
-            {userPermissionsMap['mute-user'] &&
+            {userPermissionsMap['mute-user button-34'] &&
                 <Option>
-                    {<div>mute user</div>}
+                    {<div className='mute-user'>mute user</div>}
 
                 </Option>
             }

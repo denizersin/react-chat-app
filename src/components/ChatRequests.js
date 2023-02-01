@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { getUsers, respondChatRequest } from '../services/fb';
+import UserProfile from './UserProfile';
 
-export default function ChatRequests() {
+export default function ChatRequests({ isActive, setIsActive }) {
     const userData = useSelector(state => state.userData.value);
-    
+
     const [requests, setRequests] = useState([]);
     const getUser = async () => {
         if (userData.recievedRequestIds.length == 0) {
@@ -19,7 +20,6 @@ export default function ChatRequests() {
         console.log('============')
         getUser();
     }, [userData]);
-    console.log(userData)
     console.log('chat requests RENDERED')
 
     const handleApproveReq = async (e, user2, isApprove) => {
@@ -27,15 +27,19 @@ export default function ChatRequests() {
 
     }
     return (
-        <div className={'ChatRequests component'}> <span>ChatRequests</span>
+        <div className={'ChatRequests component ' + `${isActive ? 'active' : ''}`}> <span>ChatRequests</span>
             {requests.map(rUser => {
                 return (
-                    <div key={rUser.id}>
-                        {rUser.displayName}
-                        <button onClick={(e) => handleApproveReq(e, rUser, true)}>approve</button>
-                        <button onClick={(e) => handleApproveReq(e, rUser, false)}>reject</button>
-                    </div>)
+                    <UserProfile user={rUser}>
+                        <div className='user-request' key={rUser.id}>
+                            <button onClick={(e) => handleApproveReq(e, rUser, true)}>approve</button>
+                            <button onClick={(e) => handleApproveReq(e, rUser, false)}>reject</button>
+                        </div>
+                    </UserProfile>
+
+                )
             })}
+            <div onClick={() => setIsActive(prev => !prev)} className="close">X</div>
         </div>
     )
 }

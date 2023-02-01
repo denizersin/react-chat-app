@@ -1,0 +1,19 @@
+.CreateGroupForm {
+    position: absolute;
+    z-index: 10;
+    background-color: rosybrown;
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+
+    >.close {
+        background-color: rgb(208, 197, 111);
+        position: absolute;
+        left: calc(100% - 20px);
+        top: 0;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        cursor: pointer;
+    }
+}

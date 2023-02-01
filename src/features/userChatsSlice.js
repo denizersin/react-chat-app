@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { store } from './store';
 
 
 
@@ -7,7 +8,8 @@ const initialState = {
 };
 
 
-
+export const userChatsSelector = (state) => state.userChats.value;
+export const getUserChatsVal = () => store.getState().userChats.value;
 
 export const userChatSlice = createSlice({
     name: 'userChats',

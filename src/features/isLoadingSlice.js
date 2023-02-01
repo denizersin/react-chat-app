@@ -1,8 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { store } from './store';
 
 const initialState = {
     value: false
 };
+export const isLoadingSelector = (state) => state.isLoading.value
+export const getIsLoadingVal = () => store.getState().isLoading.value;
 
 export const isLoadingSlice = createSlice({
     name: 'isLoading',

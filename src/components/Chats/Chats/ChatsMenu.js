@@ -4,7 +4,8 @@ import { searchUsersByName } from '../../../services/fb';
 import RequestProvider from '../../RequestProvider';
 import UserProfile from '../../UserProfile';
 import ChatMenu from './ChatMenu';
-
+import '../../../styles/ChatsMenu.css'
+import { BsSearch } from 'react-icons/bs';
 export default function ChatsMenu() {
     console.log('chatsMenu')
     let userChatsData;
@@ -38,7 +39,7 @@ export default function ChatsMenu() {
 
     const renderedChatMenus = menuResult.map(resultData => {
         const isAChat = resultData.hasOwnProperty("type")
-        console.log(resultData,'()*(*')
+        console.log(resultData, '()*(*')
         return (
             <React.Fragment key={resultData.id}>
                 {isAChat ?
@@ -60,9 +61,11 @@ export default function ChatsMenu() {
 
     return (
         <div className={'ChatsMenu component'}> <span>ChatsMenu</span>
-            <div>
+            <div className='search-input'>
                 <input type="text" onChange={(e) => setSearchedUserVal(e.target.value)} value={searchedUserVal} />
-                <button onClick={handleSearch}>search</button>
+                <button onClick={handleSearch}>
+                    <BsSearch />
+                </button>
             </div>
             <div className="chat-menus">
                 {renderedChatMenus}

@@ -1,0 +1,77 @@
+.ChatScreen > .chat-screen {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  width: 100%;
+  height: 96vh;
+}
+
+.ChatScreen > .chat-screen > div {
+  -webkit-transition: height .3s linear;
+  transition: height .3s linear;
+}
+
+.ChatScreen > .chat-screen > .MessagesContainer {
+  height: 580px;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+}
+
+.ChatScreen > .chat-screen > .MessagesContainer.active {
+  height: 300px;
+}
+
+.ChatScreen > .chat-screen > .MessageForm > .MessageForm {
+  height: 65px;
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-transition: all .3s linear;
+  transition: all .3s linear;
+}
+
+.ChatScreen > .chat-screen > .MessageForm > .MessageForm .r1 {
+  height: 0px;
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+  overflow: hidden;
+}
+
+.ChatScreen > .chat-screen > .MessageForm > .MessageForm .r2 {
+  -webkit-box-flex: 0;
+      -ms-flex-positive: 0;
+          flex-grow: 0;
+  height: 65px;
+}
+
+.ChatScreen > .chat-screen > .MessageForm > .MessageForm.active {
+  height: 350px;
+}
+
+.ChatScreen > .chat-screen > .MessageForm > .MessageForm.active > .r1.assets {
+  height: 200px;
+}
+
+.ChatScreen > .chat-screen > .MessageForm > .MessageForm.active > .r2 > .c.emoji {
+  background-color: rgba(128, 128, 128, 0.607);
+}
+
+.ChatScreen > .chat-screen > .MessageForm > .MessageForm.active > .r2 > .c1,
+.ChatScreen > .chat-screen > .MessageForm > .MessageForm.active > .r2 > .c3,
+.ChatScreen > .chat-screen > .MessageForm > .MessageForm.active > .r2 > .c4 {
+  width: 35px;
+}
+
+.ChatScreen > .chat-screen.PrivChatScreen > .PrivChatInfo {
+  height: 65px;
+}
+
+.ChatScreen > .chat-screen.GroupChatScreen > .GroupChatInfo {
+  height: 65px;
+}

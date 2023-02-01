@@ -1,13 +1,16 @@
 import { async } from '@firebase/util';
 import React, { useState } from 'react'
+import { createParticipantIdsMap, groupArrivalData } from '../../constants';
 import { store } from '../../features/store';
-import { createGroupChat, searchUsersByName } from '../../services/fb';
+import { getUserDataVal } from '../../features/userDataSlice';
+import { createGroupChat, searchUsersByName, sentActiviteMessage } from '../../services/fb';
 import UserProfile from '../UserProfile';
 import SelectProvider from './SelectProvider';
 
-export default function CreateGroupForm() {
-    const user = store.getState().userData.value;
-    
+import "../../styles/CreateGroupForm.css"
+export default function CreateGroupForm({ isActive, toggleCreateGroup }) {
+    const userData = getUserDataVal();
+
     const [searchedVal, setSearchedVal] = useState('');
     const [groupForm, setGroupForm] = useState({ groupName: '' });
     const [selectedUsers, setSelectedUsers] = useState([]);
@@ -34,28 +37,36 @@ export default function CreateGroupForm() {
     }
 
     const handleCreateNewGroup = async (e) => {
-
+        const participantIds = [userData.id, ...selectedUsers.map(u => u.id)]
         const groupData = {
             type: 'group',
-            participantIds: [user.id, ...selectedUsers.map(u => u.id)],
-            admins: [user.id],
-            groupName: 'groupName'
+            participantIds: participantIds,
+            admins: [userData.id],
+            groupName: groupForm.groupName,
+            lastSawMessagesMap: createParticipantIdsMap(participantIds, null),
+            rolesMap: {
+                ...createParticipantIdsMap(participantIds, 'normal'),
+                [userData.id]: 'admin'
+            },
         }
-        await createGroupChat(groupData);
+        await createGroupChat(groupData, userData);
         resetStates();
+        toggleCreateGroup();
     }
 
     const validataGroupForm = selectedUsers.length != 0 && groupForm.groupName
     return (
         <div className={'CreateGroupForm component'}> <span>CreateGroupForm</span>
-            {(<button disabled={!validataGroupForm} onClick={handleCreateNewGroup}>create new group</button>)}
-            <div>group definitions(form)
+            <div className="create">
+                {(<button disabled={!validataGroupForm} onClick={handleCreateNewGroup}>create new group</button>)}
+            </div>
+            <div className='form'>
                 <label htmlFor="">group name:</label>
                 <input type="text"
                     value={groupForm.groupName}
                     onChange={(e) => setGroupForm({ ...groupForm, groupName: e.target.value })} />
             </div>
-            <div>
+            <div className='selected-users'>
                 {selectedUsers.map(user => (
                     <UserProfile key={user.id} user={user}>
                         <SelectProvider user={user} selectedUserState={selectedUserState} />
@@ -75,6 +86,9 @@ export default function CreateGroupForm() {
                 ))}
             </div>
 
+
+
+            <div onClick={toggleCreateGroup} className="close">X</div>
         </div>
     )
 }

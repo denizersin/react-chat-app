@@ -1,0 +1,18 @@
+.Home {
+    display: flex;
+    font-family: 'Noto Sans Chakma', sans-serif;
+    font-family: 'Nunito', sans-serif;
+
+    >.left {
+        width: 450px;
+        background-color: #3F4E4F;
+    }
+
+    >.right {
+        width: 600px;
+        flex: 1;
+    }
+
+    background-color: #2C3639;
+    color: white;
+}

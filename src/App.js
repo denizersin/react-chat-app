@@ -5,7 +5,9 @@ import { useSelector } from 'react-redux'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { store } from './features/store'
 import { checkuserAuth } from './features/userAuthSlice'
+import { getUserDataVal } from './features/userDataSlice'
 import Auth from './pages/Auth'
+import FetchProvider from './pages/FetchProvider'
 import Home from './pages/Home'
 import MainLayOut from './pages/MainLayOut'
 import Register from './pages/Regiester'
@@ -20,7 +22,6 @@ export const App = () => {
   const { pathName } = useLocation();
 
   const navigate = useNavigate();
-
   if (pathName == "/" && userAuth.status == "succeeded" && userAuth.userAuth == null) {
     navigate("/auth")
   }
@@ -29,7 +30,7 @@ export const App = () => {
   return (
     <Routes>
       <Route path='/' element={<MainLayOut />}>
-        <Route index={true} element={<Home />} />
+        <Route index={true} element={userAuth.userAuth && <FetchProvider />} />
         <Route path='auth' element={<Auth />} />
         <Route path='register' element={<Register />}></Route>
       </Route>

@@ -1,0 +1,145 @@
+.left {
+    padding: 10px;
+}
+
+.UserProfile {
+    width: 100%;
+    display: flex;
+    height: 65px;
+    gap: 4px;
+
+    >.c {
+        display: flex;
+    }
+
+    >.c.c1.img-c {
+        width: max-content;
+        height: 100%;
+
+        >img {
+            border-radius: 50%;
+        }
+    }
+
+    >.c.c2 {
+        width: 80%;
+        flex-direction: column;
+        flex: 1;
+
+        >.r1.user-name {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+    }
+}
+
+//interface
+UserProfile {
+    .c {}
+
+    >.c1.img-c {
+        >img {}
+    }
+
+    >.c2 {
+        >.r1.user-name {}
+
+        >.r2.children {}
+    }
+}
+
+.Home>.left>.UserProfile {
+    .c {}
+
+    >.c1.img-c {
+        >img {}
+    }
+
+    >.c2 {
+        >.r1.user-name {
+            font-size: 1.5em;
+        }
+
+        >.r2.children {
+
+            // notifications
+
+        }
+    }
+}
+
+.chat-menus {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    >.ChatMenu {
+        height: 55px;
+        display: flex;
+        align-items: center;
+        position: relative;
+
+        &:hover,
+        &.active {
+            background-color: rgb(44, 54, 57);
+            border:4px solid #03A9F1;
+            border-radius: 6px;
+        }
+
+        >.UserProfile {
+
+
+            cursor: pointer;
+            height: 40px;
+
+            .c {}
+
+            >.c1.img-c {
+                >img {}
+            }
+
+            >.c2 {
+                >.r1.user-name {}
+
+                >.r2.children {
+                    .last-message {
+                        display: flex;
+                        justify-content: space-between;
+                    }
+                }
+            }
+        }
+
+        >.unsaw-num {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: yellowgreen;
+            border-radius: 50%;
+            top: calc(100% - 20px);
+            z-index: 5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        >.unsaw-num.anim {
+            animation: scale-anim .3s cubic-bezier(0.075, 0.82, 0.165, 1);
+        }
+    }
+}
+
+@keyframes scale-anim {
+    0% {
+        scale: 1;
+    }
+
+    50% {
+        scale: 1.3;
+
+    }
+
+    100% {
+        scale: 1;
+    }
+}

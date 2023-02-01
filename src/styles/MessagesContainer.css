@@ -1,0 +1,174 @@
+.MessagesContainer {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: reverse;
+      -ms-flex-direction: column-reverse;
+          flex-direction: column-reverse;
+  height: 580px;
+  overflow-y: scroll;
+  gap: 3px;
+}
+
+.MessagesContainer > .Message {
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.MessagesContainer > .Message > .msg {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  padding: 4px;
+  height: -webkit-max-content;
+  height: -moz-max-content;
+  height: max-content;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+  max-width: 80%;
+  display: flex;
+  font-size: 1.1em;
+}
+
+.MessagesContainer > .Message > .msg > .c1 {
+  text-align: center;
+  width: 50px;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+}
+
+.MessagesContainer > .Message > .msg > .c1 > img {
+  width: 60%;
+  border-radius: 50%;
+}
+
+.MessagesContainer > .Message > .msg > .c2 {
+  background-color: #373e4e;
+  background-color: #3F4E4F;
+  width: 100%;
+  height: auto;
+  padding: 7px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  gap: 4px;
+  border: 1px solid #908a8a;
+  border-radius: 10px;
+}
+
+.MessagesContainer > .Message > .msg > .c2 > .name {
+  height: 20px;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+}
+
+.MessagesContainer > .Message > .msg > .c2 > .Text {
+  min-width: 40px;
+  max-height: 100px;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+.MessagesContainer > .Message > .msg > .c2 > .time-arrival {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  font-size: .8em;
+}
+
+.MessagesContainer > .Message > .msg > .c2 > .time-arrival > .ArrivalStatus {
+  font-size: 1.2em;
+}
+
+.MessagesContainer > .Message > .msg > .c2 > .time-arrival > .ArrivalStatus.saw {
+  color: #499ca2;
+}
+
+.MessagesContainer > .Message > .msg > .c2 > .time-arrival > .ArrivalStatus.anim {
+  -webkit-animation: scale-anim 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
+          animation: scale-anim 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.MessagesContainer > .Message > .msg > .c2.new-user2-msg {
+  border-top-left-radius: 0px;
+}
+
+.MessagesContainer > .Message > .msg.user2 {
+  margin-left: 3%;
+}
+
+.MessagesContainer > .Message > .msg.user1 {
+  -ms-flex-item-align: end;
+      align-self: flex-end;
+  margin-right: 5%;
+}
+
+.MessagesContainer > .Message > .msg.user1 > .c.c2 {
+  border-bottom-right-radius: 0px;
+}
+
+.MessagesContainer > .activite {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  height: -webkit-max-content;
+  height: -moz-max-content;
+  height: max-content;
+}
+
+.MessagesContainer > .activite > span {
+  display: inline-block;
+  padding: 4px;
+  border: 1px solid #dcd7c9b7;
+  font-size: .8em;
+  border-radius: 8px;
+}
+
+@-webkit-keyframes scale-anim {
+  0% {
+    scale: 1;
+  }
+  50% {
+    scale: 1.2;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+@keyframes scale-anim {
+  0% {
+    scale: 1;
+  }
+  50% {
+    scale: 1.2;
+  }
+  100% {
+    scale: 1;
+  }
+}

@@ -14,6 +14,7 @@ const db = firebase.db;
 const auth = firebase.auth;
 
 const register = async (email, password, displayName, avatarUrl) => {
+    avatarUrl=avatarUrl||dataModel.userData.avatarUrl
     try {
         const newUser = await createUserWithEmailAndPassword(auth, email, password)
         console.log(newUser);

@@ -1,0 +1,104 @@
+.MessageForm {
+    display: flex;
+    flex-direction: column;
+    background-color: #3F4E4F;
+    >.r {
+        transition: all .2s ease-out;
+    }
+
+    >.r.r1 {
+        height: 0px;
+        width: 100%;
+
+
+        >.Emojies {
+            display: flex;
+            flex-wrap: wrap;
+
+            >.emoji {
+                width: 40px;
+                height: 40px;
+                font-size: 1.3em;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+            }
+
+            >.emoji:hover {
+                background-color: gainsboro;
+            }
+        }
+    }
+
+
+
+    >.r2 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        gap: 2px;
+
+        >.c {
+            // width: 35px;
+            width: 0px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all .2s ease-out;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 35px;
+            border-radius: 5px;
+        }
+
+        >.c:hover {
+            background-color: rgba(128, 128, 128, 0.607);
+        }
+
+        >.c.emoji {
+            width: 35px;
+        }
+
+        >.c.attach {
+            width: 35px;
+
+            >svg {
+                font-size: 25px;
+            }
+        }
+
+        >.c.input {
+            width: 760px;
+            flex-grow: 1;
+
+            >input {
+                width: 97%;
+                height: 30px;
+            }
+        }
+
+        >.c.send-message {
+            flex-grow: .1;
+            width: 50px;
+            padding: 5px;
+            >button {
+                width: 100%;
+                height: 35px;
+                cursor: pointer;
+            }
+        }
+
+        >.c svg {
+            font-size: 30px;
+        }
+
+        &:hover {
+            >.c {
+                // width: 40px;
+            }
+        }
+    }
+
+}

@@ -4,10 +4,11 @@ import { collection, addDoc } from "firebase/firestore";
 import { doc, updateDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import toast from "react-hot-toast";
-import { dataModel, getMergedId, privMessageData } from "../constants";
+import { dataModel, getMergedId, getUserPermissionsMap, groupArrivalData, privMessageData } from "../constants";
 import { store } from "../features/store";
 import { addNewChatToUserChats, updateAMessageById, updateChatDataById, updateChatsDataValue, updateMessagesById } from "../features/userChatsSlice";
-import { updateUserData } from "../features/userDataSlice";
+import { getUserDataVal, updateUserData } from "../features/userDataSlice";
+import { addNewChatToGroupChats, getGroupChatsVal, updateAGroupMessageById, updateGroupChatDataById, updateGroupChatsData, updateGroupMessagesById } from "../features/groupChatsSlice";
 
 export let hello = "asd";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -72,41 +73,57 @@ export const createPrivChat = async (user, user2Id) => {
     })
 
 }
-
-
-
-export const createGroupChat = async (groupData) => {
+export const createGroupChat = async (groupData, userData) => {
     if (!canCreateNewChat()) return;
-    const groupChatDocRef = doc(collection(db, "userChats"));
+    const groupChatDocRef = doc(collection(db, "groupChats"));
     const groupChatId = groupChatDocRef.id;
     await setDoc(groupChatDocRef, {
         id: groupChatId,
-        ...groupData
+        ...groupData,
     });
     const { participantIds } = groupData
     const promises = participantIds.map(userId => {
         return updateDoc(doc(db, "users", userId), {
-            chatIds: arrayUnion(groupChatId)
+            groupChatIds: arrayUnion(groupChatId)
         })
     })
     try {
         await Promise.all(promises)
         toast.success('grup basariyla olusturuldu')
+        sendActiviteMessage(groupChatId, `${userData.displayName} created group`)
     } catch (error) {
         toast.error(error)
     }
 }
+export const sendGroupMessage = async (chatId, messageData) => {
+    const newDocRef = doc(collection(db, "groupChats", chatId, "messages"));
+    const newMessageId = newDocRef.id;
+    try {
+        await setDoc(
+            newDocRef,
+            {
+                ...messageData,
+                id: newMessageId, //set its id initiallay
+                sentTime: Timestamp.now()
+            }
+        )
+        return true;
+    }
+    catch (e) {
+        return false
+    }
+}
 
-export const sendAMessage = async (user, chatId, messageData) => {
+export const sendAMessage = async (chatId, messageData) => {
     const newDocRef = doc(collection(db, "userChats", chatId, "messages"));
     const newMessageId = newDocRef.id;
     try {
         await setDoc(
             newDocRef,
             {
-                ...dataModel.privMessageData,
                 ...messageData,
                 id: newMessageId, //set its id initiallay
+                sentTime: Timestamp.now()
             }
         )
         updateArrivalStatus(chatId, newMessageId, 'sent');
@@ -124,18 +141,48 @@ async function updateArrivalStatus(chatId, msgId, status) {
     })
 
 }
+export const updateLastISawMsg = async (user, chatid, lastMsgId) => {
+    const ref = doc(db, 'groupChats', chatid);
+    try {
+        await setDoc(ref,
+            {
+                "lastSawMessagesMap": {
+                    [user.id]: lastMsgId
+                }
+            },
+            { merge: true }
+        );
+        return true;
+    }
+    catch (e) {
+        console.log(e)
+        return false;
+    }
 
+}
 export async function getUsers(userIds) {
-    const q = query(
-        collection(db, "users"),
-        where(documentId(), "in",
-            userIds
-        ),
-    );
-    const users = await getDocsWithQuery(q);
+    const users = []
+    const promises = userIds.map(uid => {
+        return getDocData("users", uid).then(userDocData => users.push(userDocData));
+    })
+    await Promise.all(promises);
     return users;
 }
 
+
+export const sendActiviteMessage = async (groupChatId, activiteText) => {
+    const newDocRef = doc(collection(db, "groupChats", groupChatId, "messages"));
+    const newMessageId = newDocRef.id;
+    await setDoc(
+        newDocRef,
+        {
+            id: newMessageId, //set its id initiallay
+            sentTime: Timestamp.now(),
+            type: 'activite',
+            text: activiteText
+        }
+    )
+}
 export const getUserChats = async (user) => {
     const { chatIds } = user;
     if (chatIds.length == 0) return {}
@@ -150,33 +197,24 @@ export const getUserChats = async (user) => {
     const userChatsdata = {};
 
     const promises3 = chatsData.map(chatData => {
-        userChatsdata[chatData.id] = chatData
         chatData.participantsMap = {}
-
-        if (chatData.type == 'group') {
-            return chatData.participantIds.map(uid =>
-            (getDocData('users', uid)
-                .then(userDoc => {
-                    chatData.participantsMap[uid] = userDoc
-                })))
-        }
-        if (chatData.type == 'private') {
-            let user2Id = getUser2(user, chatData.participantIds)
-            return getDocData("users", user2Id).then(userData => {
-                userChatsdata[chatData.id].user2 = userData;
-                userChatsdata[chatData.id].participantsMap[user2Id] = userData;
-                userChatsdata[chatData.id].participantsMap[user.id] = user;
-            })
-        }
+        let user2Id = getUser2(user, chatData.participantIds)
+        return getDocData("users", user2Id).then(userData => {
+            chatData.user2 = userData;
+            chatData.participantsMap[user2Id] = userData;
+            chatData.participantsMap[user.id] = user;
+            userChatsdata[chatData.id] = chatData
+        })
 
     })
 
-    await Promise.all(promises3.flat());
+    await Promise.all(promises3.flat(Infinity));
 
 
     //set nested collection (messages)
     const promises = chatsData.map(async (data) => {
         const unSawMessages = await getUnSawMessages(data);
+
         data.messages = unSawMessages;
         data.gotMsgNum = unSawMessages.length;
         let unSawMessagesNum = unSawMessages.length
@@ -191,6 +229,7 @@ export const getUserChats = async (user) => {
     })
     try {
         await Promise.all(promises);
+        //recieve messages
         chatsData.forEach(chatData => {
             const unRecievedMessages = chatData.messages.filter(msg => msg.from !== user.id && (msg.recievedTime === null));
             unRecievedMessages.forEach(msgData => updateArrivalStatus(chatData.id, msgData.id, 'recieved'))
@@ -203,7 +242,51 @@ export const getUserChats = async (user) => {
     return userChatsdata
 }
 
+export const getGroupChats = async (user) => {
+    const { groupChatIds } = user;
+    if (groupChatIds.length == 0) return {}
+    const q = query(
+        collection(db, "groupChats"),
+        where(documentId(), "in",
+            groupChatIds
+        ),
+    );
+    const groupsChatsData = await getDocsWithQuery(q);
 
+    const promises = groupsChatsData.map(async (gData) => {
+        const unSawMessages = await getUnsawGroupMessages(gData)
+        let unSawMessagesLen = 50;
+        gData.gotMsgNum = 0;
+        gData.messages = [];
+        gData.allMessages = [];
+        const messages = await getNewGroupMessage(gData, unSawMessagesLen);
+        gData.allMessages = messages;
+        gData.messages = messages.filter(msg => msg.type != 'activite');
+        gData.gotMsgNum = messages.length;
+    })
+
+    await Promise.all(promises);
+    //! generate userChatsData[chatId]=chatData;
+    const userGroupsData = {};
+    groupsChatsData.forEach(gData => {
+        userGroupsData[gData.id] = gData;
+        const userRole = gData.rolesMap[user.id];
+        userGroupsData[gData.id].userPermissionsMap = getUserPermissionsMap(userRole)
+        gData.participantsMap = {};
+    })
+
+
+    const getUserDatasPromises = groupsChatsData
+        .map(groupData => {
+            return getParticipantsMap(groupData.participantIds)
+                .then(participantsMap => groupData.participantsMap = participantsMap)
+        })
+
+    await Promise.all(getUserDatasPromises);
+
+    return userGroupsData;
+
+}
 
 export async function setMessagesRecieved(chatId, messages) {
     const userId = store.getState().userData.value.id;
@@ -225,7 +308,7 @@ export async function setMessagesRecieved(chatId, messages) {
     }
 }
 export async function setMessagesSaw(chatId, messages) {
-    messages = messages.filter(msg => (msg.sawTime == null));
+    messages = messages.filter(msg => (msg.arrivalStatus !== 'saw'));
     const promises = messages.map(async (msg) => {
         const msgref = doc(db, "userChats", chatId, "messages", msg.id);
         await updateDoc(msgref, {
@@ -322,9 +405,12 @@ export const cancelChatRequest = async (user, user2Id) => {
 
 
 
+
 export const listenerUnsbs = {
     userChats: [],
     userData: null,
+    userGroupChats: [],
+    userGroupsData: []
 }
 
 
@@ -332,20 +418,23 @@ export const listenUserData = (user) => {
     console.log('listen userData')
     const unsub = onSnapshot(doc(db, "users", user.id), (doc) => {
         const currentUserData = doc.data();
-        const currentChatIds = currentUserData.chatIds;
-        const prevChatIds = store.getState().userData.value.chatIds;
+        const prevUserData = getUserDataVal();
         console.log('listener!!')
 
-        const createdChatIds = currentChatIds.filter(cId => !prevChatIds.some(pId => pId === cId))
-        console.log(createdChatIds, 'createdChatIds')
+        const createdChatIds = currentUserData.chatIds.filter(cId => !prevUserData.chatIds.some(pId => pId === cId))
+        const createdGroupChatIds = currentUserData.groupChatIds.filter(cId => !prevUserData.groupChatIds.some(pId => pId === cId))
+        console.log(createdChatIds, createdGroupChatIds, 'createdChatIds')
         if (createdChatIds.length != 0) {
             getNewUserChats(user, createdChatIds)
+        }
+        if (createdGroupChatIds.length != 0) {
+            debugger;
+            getNewGroupChats(user, createdGroupChatIds);
         }
         store.dispatch(updateUserData(currentUserData))
     });
     listenerUnsbs.userData = unsub;
 }
-let messagesListenerCounter = 0;
 export const lisetnUserChats = (user, userChatsData) => {
 
     listenerUnsbs.userChats.forEach(unsb => unsb())
@@ -359,10 +448,12 @@ export const lisetnUserChats = (user, userChatsData) => {
         const unsubscribe = onSnapshot(q3, (snapshot) => {
             snapshot.docChanges().forEach(async (change) => {
                 if (change.type === "added") {
+
                     const debug = store.getState().userChats.value[chatId].messages
                         .some(msg => msg.id == change.doc.data().id);
                     let debug2 = Timestamp.now().seconds - change.doc.data().sentTime.seconds > 2000
                     if (debug || debug2) return;
+
                     const prevChatsData = store.getState().userChats.value
                     if (!prevChatsData) return
                     const prevChatData = prevChatsData[chatId];
@@ -386,6 +477,67 @@ export const lisetnUserChats = (user, userChatsData) => {
     })
 }
 
+export const listenUserGroupChats = (user) => {
+    listenerUnsbs.userGroupChats.forEach(unsb => unsb());
+    listenerUnsbs.userGroupChats = [];
+    const { groupChatIds } = user;
+    groupChatIds.forEach(chatId => {
+        console.log('added listener to', chatId)
+        const q3 = query(collection(db, "groupChats", chatId, "messages"));
+        const unsubscribe = onSnapshot(q3, (snapshot) => {
+            snapshot.docChanges().forEach(async (change) => {
+                if (change.type === "added") {
+
+                    const currGroupsChatData = getGroupChatsVal();
+                    const debug = currGroupsChatData[chatId].messages
+                        .some(msg => msg.id == change.doc.data().id);
+                    if (debug) return;
+
+                    const currThisGroupChatData = currGroupsChatData[chatId];
+                    console.log(currThisGroupChatData)
+                    const newThisGroupChatData =
+                        await getNewGroupMessage(currThisGroupChatData, 1);
+                    store.dispatch(updateGroupMessagesById({
+                        id: chatId,
+                        messages: newThisGroupChatData.filter(msg => msg.type != 'activite'),
+                        allMessages: newThisGroupChatData
+                    }))
+
+                    console.log('added');
+                }
+                if (change.type === "modified") {
+                    console.log('modified')
+                    const data = change.doc.data();
+                    // store.dispatch(updateAGroupMessageById({
+                    //     chatId, id: data.id, data
+                    // }))
+                }
+            });
+        });
+        listenerUnsbs.userGroupChats.push(unsubscribe);
+    })
+}
+
+export const listenUserGroupChatsData = (user) => {
+    listenerUnsbs.userGroupsData.forEach(unsb => unsb());
+    listenerUnsbs.userGroupsData = [];
+    const { groupChatIds } = user;
+    const q3 = query(collection(db, "groupChats"), where("id", "in", groupChatIds));
+    const unsubscribe = onSnapshot(q3, (snapshot) => {
+        snapshot.docChanges().forEach(async (change) => {
+            const newData = change.doc.data();
+            let chatId = newData.id;
+            if (change.type === "modified") {
+                const prevData = getGroupChatsVal()[chatId];
+                const data = { ...prevData, ...newData };
+                console.log(prevData)
+                console.log(chatId, data);
+                store.dispatch(updateGroupChatDataById({ chatId, data }))
+            }
+        });
+    });
+    listenerUnsbs.userGroupsData.push(unsubscribe);
+}
 
 export const getNewUserChats = async (userData, createdChatIds) => {
     const promises = createdChatIds.map(async (chatId) => {
@@ -397,6 +549,11 @@ export const getNewUserChats = async (userData, createdChatIds) => {
         chatData.messages = messages;
         chatData.user2 = user2;
         chatData.gotMsgNum = 0;
+        chatData.participantsMap = {};
+        const promises = chatData.participantIds.map(uid => {
+            return getDocData('users', uid).then(userDoc => chatData.participantsMap[userDoc.id] = userDoc)
+        })
+        await Promise.all(promises);
         store.dispatch(addNewChatToUserChats(chatData));
     })
     await Promise.all(promises)
@@ -404,6 +561,45 @@ export const getNewUserChats = async (userData, createdChatIds) => {
 }
 
 
+export const getParticipantsMap = async (participantIds) => {
+    const participantsMap = {};
+    const promises = participantIds.map(async (uid) => {
+        const userData = await getDocData('users', uid)
+        participantsMap[uid] = userData;
+    })
+    await Promise.all(promises);
+    return participantsMap;
+}
+
+export const getNewGroupChats = async (userData, createdGroupChatIds) => {
+    const promises = createdGroupChatIds.map(async (chatId) => {
+        const chatData = await getDocData('groupChats', chatId);
+        chatData.allMessages = [];
+        chatData.messages = [];
+        chatData.gotMsgNum = 0;
+        const userRole = chatData.rolesMap[userData.id];
+        chatData.userPermissionsMap = getUserPermissionsMap(userRole);
+        const participantsMap = await getParticipantsMap(chatData.participantIds);
+        chatData.participantsMap = participantsMap;
+        store.dispatch(addNewChatToGroupChats(chatData));
+    })
+    await Promise.all(promises)
+}
+
+
+export async function getUnsawGroupMessages(groupChatData) {
+    const user = store.getState().userData;
+    const lastMsgId = groupChatData[user.id];
+    if (!lastMsgId) return [];
+    const lastMessage = await getDocData('groupChats', groupChatData.id, "messages", lastMsgId);
+
+    const q = query(
+        collection(db, "groupChats", groupChatData.id, "messages"),
+        where('sentTime', ">=", lastMessage.sentTime)
+    );
+    const data = await getDocsWithQuery(q);
+    return data;
+}
 
 export async function getUnSawMessages(chatData) {
     const user = store.getState().userData;
@@ -428,7 +624,15 @@ async function getNewMessage(chatData, increment) {
     return data;
 }
 
-
+async function getNewGroupMessage(groupChatData, increment) {
+    const nextLimit = groupChatData.allMessages.length + increment;
+    const q = query(
+        collection(db, "groupChats", groupChatData.id, "messages"),
+        orderBy("sentTime", "asc"), limit(nextLimit),
+    );
+    const data = await getDocsWithQuery(q);
+    return data;
+}
 
 
 
@@ -439,6 +643,61 @@ export const searchUsersByName = async (user, userName) => {
     // findedUsers = findedUsers.filter(findedUser => findedUser.id != user.id);
     return findedUsers;
     // return resultArr;
+}
+
+
+
+
+export const updateRole = async (groupChatId, user2, newRole) => {
+    const userData = getUserDataVal();
+    await setDoc(doc(db, "groupChats", groupChatId),
+        {
+            rolesMap: {
+                [user2.id]: newRole
+            }
+        }, { merge: true }
+    )
+    toast.success('rol guncellendi');
+    sendActiviteMessage(groupChatId, `${userData.displayName} assigned ${user2.displayName} as ${newRole} `)
+
+}
+
+export const removeUserFromGroup = async (groupChatId, user2) => {
+    const userData = getUserDataVal();
+    await setDoc(doc(db, "users", user2.id),
+        {
+            groupChatIds: arrayRemove(groupChatId)
+        },
+        { merge: true }
+    )
+
+
+    await setDoc(doc(db, "groupChats", groupChatId),
+        {
+            participantIds: arrayRemove(user2.id)
+        }, { merge: true }
+    )
+    toast.success('user removed')
+    sendActiviteMessage(groupChatId, `${userData.displayName} removed ${user2.displayName}`)
+}
+export const addUserToGroup = async (groupChatId, user2) => {
+    const userData = getUserDataVal();
+
+    await setDoc(doc(db, "users", user2.id),
+        {
+            groupChatIds: arrayUnion(groupChatId)
+        },
+        { merge: true }
+    )
+
+
+    await setDoc(doc(db, "groupChats", groupChatId),
+        {
+            participantIds: arrayUnion(user2.id)
+        }, { merge: true }
+    )
+    toast.success('user added')
+    sendActiviteMessage(groupChatId, `${userData.displayName} added ${user2.displayName}`)
 }
 
 

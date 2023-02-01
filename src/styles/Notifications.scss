@@ -1,0 +1,76 @@
+.Notifications {
+    >.requests {
+        cursor: pointer;
+        width: max-content;
+        border: 1px solid rgba(245, 245, 245, 0.644);
+        position: relative;
+        width: 30px;
+        height: 30px;
+
+        &:hover {}
+
+        >.request-num {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            left: 84%;
+            top: 60%;
+            background-color: yellowgreen;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            border-top-left-radius: 10%;
+        }
+
+        >.ChatRequests {
+            display: none;
+            z-index: 9;
+            width: 400px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            background-color: rgb(13, 36, 28);
+
+            >.UserProfile {
+                width: 100%;
+
+                >.c1 {
+                    width: 20%;
+                }
+
+                .user-request {
+                    display: flex;
+                    gap: 10px;
+
+                    >button {
+                        width: max-content;
+                        height: 30px;
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+
+        >.ChatRequests.active {
+            display: flex;
+            position: relative;
+            flex-direction: column;
+            padding: 10px;
+            gap: 4px;
+
+            >.close {
+                background-color: rgb(208, 197, 111);
+                position: absolute;
+                left: calc(100% - 20px);
+                top:0;
+                width: 20px;
+                height: 20px;
+                text-align: center;
+                cursor: pointer;
+            }
+        }
+    }
+
+
+}

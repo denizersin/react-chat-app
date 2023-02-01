@@ -1,0 +1,146 @@
+.left {
+  padding: 10px;
+}
+
+.UserProfile {
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  height: 65px;
+  gap: 4px;
+}
+
+.UserProfile > .c {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.UserProfile > .c.c1.img-c {
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+  height: 100%;
+}
+
+.UserProfile > .c.c1.img-c > img {
+  border-radius: 50%;
+}
+
+.UserProfile > .c.c2 {
+  width: 80%;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+
+.UserProfile > .c.c2 > .r1.user-name {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.Home > .left > .UserProfile > .c2 > .r1.user-name {
+  font-size: 1.5em;
+}
+
+.chat-menus {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  gap: 3px;
+}
+
+.chat-menus > .ChatMenu {
+  height: 55px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  position: relative;
+}
+
+.chat-menus > .ChatMenu:hover, .chat-menus > .ChatMenu.active {
+  background-color: #2c3639;
+  border: 4px solid #03A9F1;
+  border-radius: 6px;
+}
+
+.chat-menus > .ChatMenu > .UserProfile {
+  cursor: pointer;
+  height: 40px;
+}
+
+.chat-menus > .ChatMenu > .UserProfile > .c2 > .r2.children .last-message {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.chat-menus > .ChatMenu > .unsaw-num {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background-color: yellowgreen;
+  border-radius: 50%;
+  top: calc(100% - 20px);
+  z-index: 5;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.chat-menus > .ChatMenu > .unsaw-num.anim {
+  -webkit-animation: scale-anim 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+          animation: scale-anim 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+@-webkit-keyframes scale-anim {
+  0% {
+    scale: 1;
+  }
+  50% {
+    scale: 1.3;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+@keyframes scale-anim {
+  0% {
+    scale: 1;
+  }
+  50% {
+    scale: 1.3;
+  }
+  100% {
+    scale: 1;
+  }
+}

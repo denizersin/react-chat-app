@@ -1,0 +1,24 @@
+.CreateGroupForm {
+  position: absolute;
+  z-index: 10;
+  background-color: rosybrown;
+  width: 400px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.CreateGroupForm > .close {
+  background-color: #d0c56f;
+  position: absolute;
+  left: calc(100% - 20px);
+  top: 0;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  cursor: pointer;
+}

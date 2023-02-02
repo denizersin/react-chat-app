@@ -1,10 +1,8 @@
-import { isDisabled } from '@testing-library/user-event/dist/utils';
 import React from 'react'
-import { CiVolumeHigh } from 'react-icons/ci';
-import { dataModel, getGroupArrivalMaps } from '../../constants';
-import { getUserDataVal } from '../../features/userDataSlice';
-import { sendGroupMessage } from '../../services/fb';
-import MessageForm from '../Chats/ChatScreen/MessageForm';
+import { dataModel, getGroupArrivalMaps } from '../../../../constants';
+import { getUserDataVal } from '../../../../features/userDataSlice';
+import { sendGroupMessage } from '../../../../services/fb';
+import MessageForm from '../MessageForm';
 
 export default function GroupMessageForm({ chatData, activeEmoji, toggleActiveEmoji }) {
     const userData = getUserDataVal();

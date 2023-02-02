@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux';
-import { getGroupChatsVal, groupChatsSelector, updateGroupChatsData } from '../../features/groupChatsSlice';
-import { store } from '../../features/store';
-import { getUserDataVal } from '../../features/userDataSlice';
-import { getGroupChats, listenUserGroupChats, listenUserGroupChatsData } from '../../services/fb';
-import GroupMenu from './GroupMenu';
-import "../../styles/Groups.css"
-import CreateGroupForm from './CreateGroupForm';
+import { getUserDataVal } from '../../../features/userDataSlice';
+import { getGroupChatsVal } from '../../../features/groupChatsSlice';
+import { listenUserGroupChats, listenUserGroupChatsData } from '../../../services/fb';
+import GroupMenu from "./GroupMenu"
+import "../../../styles/Groups.css"
+import CreateGroupForm from './CreateGroupForm/CreateGroupForm';
+
+
 export const Groups = () => {
     const groupChatsData = Object.values(getGroupChatsVal());
     const userData = getUserDataVal();
@@ -16,7 +16,6 @@ export const Groups = () => {
         listenUserGroupChatsData(userData);
     }, [groupChatsData.length]);
 
-    console.log(getGroupChatsVal())
     const toggleCreateGroup = () => {
         setIsActive(prev => !prev);
     }

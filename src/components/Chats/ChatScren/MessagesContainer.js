@@ -1,16 +1,16 @@
 import React, { memo } from 'react'
-import Message from './Message';
+import { lastIndexOf } from '../../../constants';
 import { getUserDataVal } from '../../../features/userDataSlice';
 import { updateLastISawMsg } from '../../../services/fb';
-import { lastIndexOf } from '../../../constants';
-import Text from '../../Message/Text';
 import Images from '../../Message/Images';
-import '../../../styles/MessagesContainer.css'
+import Message from '../../Message/Message';
+import Text from '../../Message/Text';
+
+import "../../../styles/MessagesContainer.css"
 
 
 
-
-function MessagesContainer({ chatData, activeEmoji }) {
+export default function MessagesContainer({ chatData, activeEmoji }) {
     const userData = getUserDataVal();
     console.log(chatData);
     if (chatData.type == 'group') {
@@ -58,5 +58,3 @@ function MessagesContainer({ chatData, activeEmoji }) {
         </div>
     )
 }
-
-export default (MessagesContainer);

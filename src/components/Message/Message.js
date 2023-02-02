@@ -1,10 +1,10 @@
 import { render } from '@testing-library/react';
 import React, { useEffect, useRef } from 'react'
 import { useSelector } from 'react-redux'
-import { store } from '../../../features/store';
-import { getUserDataVal } from '../../../features/userDataSlice';
-import { setMessagesSaw } from '../../../services/fb';
-import ArrivalStatus from '../../ArrivalStatus';
+import { store } from '../../features/store';
+import { getUserDataVal } from '../../features/userDataSlice';
+import { setMessagesSaw } from '../../services/fb';
+import ArrivalStatus from './ArrivalStatus';
 
 export default function Message({ msg, chatData, children, isNewUser2Msg }) {
     children = children instanceof Array ? children : [children];

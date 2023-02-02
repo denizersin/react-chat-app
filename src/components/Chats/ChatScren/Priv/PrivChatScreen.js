@@ -1,15 +1,9 @@
 import React, { memo } from 'react'
-import { useSelector } from 'react-redux'
-import { dataModel } from '../../../constants';
-import { getSelectedChatIdVal } from '../../../features/selectedChatIdSLice';
-import { getUserChatsVal } from '../../../features/userChatsSlice';
-import { getUserDataVal } from '../../../features/userDataSlice';
-import { sendAMessage } from '../../../services/fb';
-import MessageForm from './MessageForm';
-import MessagesContainer from './MessagesContainer';
-import PrivMessageForm from './PrivMessageForm';
 
-import "../../../styles/PrivChatScreen.css"
+import "../../../../styles/PrivChatScreen.css"
+import { getUserDataVal } from '../../../../features/userDataSlice';
+import MessagesContainer from '../MessagesContainer';
+import PrivMessageForm from './PrivMessageForm';
 
 export default function PrivChatScreen({ chatData }) {
     const userData = getUserDataVal();

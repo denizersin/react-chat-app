@@ -1,5 +1,5 @@
 import React from 'react'
-import "../../../../styles/Option.css"
+import "../../../../../styles/Option.css"
 export default function Option({ handleOptionClick, children }) {
     console.log(children, 'asd')
     children = children instanceof Array ? children : [children];

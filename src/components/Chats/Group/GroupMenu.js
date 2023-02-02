@@ -1,9 +1,8 @@
 import React, { useEffect, useRef } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
-import { lastIndexOf } from '../../constants';
-import { getSelectedChatIdVal, setSelectedChatId } from '../../features/selectedChatIdSLice';
-import { store } from '../../features/store';
-import { getUserDataVal } from '../../features/userDataSlice'
+import { useDispatch, } from 'react-redux';
+import { lastIndexOf } from '../../../constants';
+import { getSelectedChatIdVal, setSelectedChatId } from '../../../features/selectedChatIdSLice';
+import { getUserDataVal } from '../../../features/userDataSlice';
 
 
 const setAnimToUnSawMessages = async (elem) => {

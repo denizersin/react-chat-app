@@ -1,14 +1,9 @@
 import React from 'react'
-import { toast } from 'react-hot-toast';
-import { getUserDataVal } from '../../../../features/userDataSlice';
-import { removeUserFromGroup, updateRole } from '../../../../services/fb';
-import Option from './Option';
-
-
-
+import { removeUserFromGroup, updateRole } from '../../../../../services/fb';
+import Option from "./Option"
 
 export default function ParticipantOptions({ user2, chatData }) {
-    
+
     const userPermissionsMap = chatData.userPermissionsMap
     const participantRole = chatData.rolesMap[user2.id];
 

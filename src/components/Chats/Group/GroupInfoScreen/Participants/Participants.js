@@ -1,11 +1,9 @@
 import React, { useState } from 'react'
-import { getUserDataVal } from '../../../../features/userDataSlice';
-import UserProfile from '../../../UserProfile';
+import UserProfile from '../../../../UserProfile';
 import ParticipantOptions from './ParticipantOptions';
 
 export default function Participants({ chatData }) {
     const participantsMap = Object.values(chatData.participantsMap);
-    const userData = getUserDataVal();
     
     return (
         <div className={'Participants component'}> <span>Participants</span>

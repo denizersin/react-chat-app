@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react'
-import { getUserChatsVal, updateChatsDataValue } from '../../features/userChatsSlice';
-import { getUserDataVal } from '../../features/userDataSlice';
-import { getUserChats, lisetnUserChats, listenerUnsbs, listenUserData } from '../../services/fb';
-import ChatsMenu from './Chats/ChatsMenu';
+import { getUserChatsVal } from '../../../features/userChatsSlice';
+import { getUserDataVal } from '../../../features/userDataSlice';
+import { lisetnUserChats } from '../../../services/fb';
+import ChatsMenu from './ChatsMenu';
 
 export default function Chats() {
 

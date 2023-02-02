@@ -1,9 +1,4 @@
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
-import { dataModel } from '../../../constants';
-import { store } from '../../../features/store';
-import { getUserDataVal } from '../../../features/userDataSlice';
-import { sendAMessage } from '../../../services/fb';
 import '../../../styles/MessageForm.css'
 import { CiFaceSmile } from 'react-icons/ci'
 import { ImAttachment } from 'react-icons/im'
@@ -29,7 +24,6 @@ export default function MessageForm({ handleSendMessage, chatData, isSendMsgDisa
             content: ''
         })
     }
-    const userData = getUserDataVal();
 
     const onKeyDownInput = (e) => {
         if (e.code == 'Enter') handleClick();

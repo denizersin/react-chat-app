@@ -1,8 +1,8 @@
 import React from 'react'
-import { dataModel } from '../../../constants';
-import { getUserDataVal } from '../../../features/userDataSlice'
-import { sendAMessage } from '../../../services/fb';
-import MessageForm from './MessageForm'
+import { dataModel } from '../../../../constants';
+import { getUserDataVal } from '../../../../features/userDataSlice';
+import { sendAMessage } from '../../../../services/fb';
+import MessageForm from '../MessageForm';
 
 export default function PrivMessageForm({ chatData }) {
     const userData = getUserDataVal();

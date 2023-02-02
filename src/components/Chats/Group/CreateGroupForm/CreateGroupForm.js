@@ -1,15 +1,14 @@
-import { async } from '@firebase/util';
 import React, { useEffect, useRef, useState } from 'react'
-import { createParticipantIdsMap, groupArrivalData } from '../../constants';
-import { store } from '../../features/store';
-import { getUserDataVal } from '../../features/userDataSlice';
-import { createGroupChat, searchUsersByName, sentActiviteMessage } from '../../services/fb';
-import UserProfile from '../UserProfile';
+import { AiOutlineArrowLeft } from 'react-icons/ai';
+import { setOpenAnim1 } from '../../../..';
+import { createParticipantIdsMap } from '../../../../constants';
+import { getUserDataVal } from '../../../../features/userDataSlice';
+import { createGroupChat, searchUsersByName } from '../../../../services/fb';
+import UserProfile from '../../../UserProfile';
 import SelectProvider from './SelectProvider';
 
-import "../../styles/CreateGroupForm.css"
-import { setOpenAnim1 } from '../..';
-import { AiOutlineArrowLeft } from 'react-icons/ai';
+
+import "../../../../styles/CreateGroupForm.css"
 export default function CreateGroupForm({ isActive, toggleCreateGroup }) {
     const userData = getUserDataVal();
 

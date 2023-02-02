@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { getSelectedChatIdVal } from '../../features/selectedChatIdSLice';
-import '../../styles/GroupChatInfo.css'
-import GroupInfoScreen from './GroupInfo/GroupInfoScreen';
+import GroupInfoScreen from '../../Group/GroupInfoScreen/GroupInfoScreen';
+import '../../../../styles/GroupChatInfo.css'
+import { getSelectedChatIdVal } from '../../../../features/selectedChatIdSLice';
+
 export default function GroupChatInfo({ chatData }) {
     const selectedId = getSelectedChatIdVal();
     const [activeGroupIfo, setActiveGroupIfo] = useState(false);

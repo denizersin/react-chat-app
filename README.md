@@ -1,14 +1,21 @@
 
-TODO :arama ekraninda groupChat'i dahil etmedim bunun icin bir filtreleme algosu yapilmali
+# React-Chat-App
 
-listener ekledikten sonra listenerlarin calismasini engellemenin bir yolunu bul
-
-                    let debug2 = Timestamp.now().seconds - change.doc.data().sentTime.seconds > 2000
-
-burayi tekrar gozden gecir.
+### React-Firebase Full-Stack Chat-App
 
 
-map guncellerken updateDoc merge ile update edilemiyor. setDoc kullan!
+# Features
+- Firebase Google Auth.
+- Priv Chat
+- Role/Permission Based Group Chat (add/remove-user, assign role to user etc.)
+- Real Time Message Arrival Status
+# I Am Working On
+- adding new features
+- making code cleaner
+- fixing bugs
 
 
-permissions her groupCatte bir collection olarak tutulabilir.. cunku permissionlar guncelleniyor... ornk: send-message
+
+## 🔗 Preview 
+[Youtube Video](https://www.youtube.com/watch?v=pLerTzrwn8Q&t=142s)
+
